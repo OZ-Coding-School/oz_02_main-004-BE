@@ -1,5 +1,12 @@
 [프론트엔드 깃허브 레포지토리 링크](https://github.com/OZ-Coding-School/oz_02_main-004-FE)
 
+[팀 소개 노션페이지](https://legend-palm-1f1.notion.site/T4-12f368acae6e4bd598022cae8e993bd0)
+
+[(비공개) 팀 노션 페이지](https://www.notion.so/4-db3e7055f3dd4cd0b55d7cb3a1bfd07f)
+
+[(비공개) 주제 정하기 피그잼페이지](https://www.figma.com/board/Gsknj4d8Un6zeqw0zT0jk9/IDEAS?node-id=0-1&t=OHvqnIHfy6m64GI5-0)
+
+
 # 서비스명 넣기
 
 - 펫키우는 투두리스트
