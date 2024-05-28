@@ -21,11 +21,11 @@ class UserTypeFilter(admin.SimpleListFilter):
         
 class UserAdmin(admin.ModelAdmin):
     # 관리자 페이지에서 보여줄 필드 목록을 설정
-    list_display = ('nickname', 'email', 'is_staff', 'is_down', 'created_at')
+    list_display = ('email', 'is_staff', 'is_down', 'created_at')
     # 필터 옵션을 제공팔 필드 목록을 설정
     list_filter = (UserTypeFilter,)
     # 읽기 전용 필드 목록을 설정
-    readonly_fields = ('nickname', 'email', 'created_at', 'updated_at')
+    readonly_fields = ('email', 'created_at', 'updated_at')
 
 # user 모델을 관리자 페이지에 등록
 admin.site.register(User, UserAdmin)

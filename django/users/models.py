@@ -4,20 +4,17 @@ from django.utils import timezone
 
 class UserManager(BaseUserManager):
     use_in_migrations = True    
-    def create_user(self, email, nickname, password=None, **kwargs):
+    def create_user(self, email, password=None, **kwargs):
         if not email:
-            raise ValueError('이메일 주소는 필수 입력 사항입니다.')
-        if not nickname:
-            raise ValueError('사용자는 닉네임을 갖고 있어야 합니다.')
-        
-        user = self.model(email=self.normalize_email(email), nickname=nickname, **kwargs)
+            raise ValueError('이메일 주소는 필수 입력 사항입니다.')                
+        user = self.model(email=self.normalize_email(email), **kwargs)
 
         user.set_password(password)
         user.save(using=self._db)
         return user
     
-    def create_superuser(self, email, nickname, password=None, **kwargs):
-        user = self.create_user(email=email, password=password, nickname=nickname)
+    def create_superuser(self, email, password=None, **kwargs):
+        user = self.create_user(email=email, password=password)
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
@@ -26,7 +23,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(max_length=255, unique=True)
-    nickname = models.CharField(max_length=255, verbose_name='닉네임', unique=True)
+    # nickname = models.CharField(max_length=255, verbose_name='닉네임', unique=True)
     is_staff = models.BooleanField(default=False, verbose_name='운영진')
     is_down = models.BooleanField(default=False, verbose_name='휴면회원')
     is_active = models.BooleanField(default=True, verbose_name='활동회원')
@@ -37,15 +34,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     username = None
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['nickname']
+    # REQUIRED_FIELDS = ['nickname']
 
     LOGIN_KAKAO = 'kakao'
 
     login_method = models.CharField(max_length=20, default=LOGIN_KAKAO)
 
-    def __str__(self):
-        return f'{self.email} ({self.nickname})'
-    
     def is_staff_member(self):
         # 사용자가 운영진인지 확인한다.
         return self.is_staff
