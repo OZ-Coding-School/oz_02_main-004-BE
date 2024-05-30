@@ -192,11 +192,11 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://54.180.86.80/',
+    'http://localhost/',
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://54.180.86.80/',
+    'http://localhost/',
 ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
