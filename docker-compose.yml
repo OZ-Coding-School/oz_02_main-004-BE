@@ -10,16 +10,18 @@ services:
       bash -c "python manage.py collectstatic --no-input &&
       python manage.py makemigrations &&
       python manage.py migrate &&
-      gunicorn config.wsgi:application --bind 0.0.0.0:8080"
+      gunicorn config.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - ./django:/app
       - static_volume:/app/static
       - media_volume:/app/media
-      - ./django/static:/app/static
+      - ./staticfiles:/app/staticfiles
     depends_on:
       - db
     ports:
-      - "8080:8080"
+      - "8000:8000"
+    networks:
+      - app-network
 
   nginx:
     image: nginx:1.17.10
@@ -30,8 +32,11 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - static_volume:/usr/share/nginx/html/static/
+      - media_volume:/usr/share/nginx/html/media/
     depends_on:
       - web
+    networks:
+      - app-network
 
   db:
     image: postgres:12.2
@@ -44,8 +49,13 @@ services:
       POSTGRES_PASSWORD: admin
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+
+networks:
+  app-network:
