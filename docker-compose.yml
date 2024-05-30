@@ -15,6 +15,7 @@ services:
       - ./django:/app
       - static_volume:/app/static
       - media_volume:/app/media
+      - ./django/static:/app/static
     depends_on:
       - db
     ports:
