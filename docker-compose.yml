@@ -2,7 +2,9 @@ version: "3"
 
 services:
   web:
-    build: .
+    build:
+      context: ./django
+      dockerfile: Dockerfile
     container_name: dg01
     command: >
       bash -c "python manage.py collectstatic --no-input &&
