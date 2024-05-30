@@ -76,7 +76,7 @@ class MyInfoView(APIView):
 class KakaoView(APIView):
     def get(self, request):
         kakao_api = 'https://kauth.kakao.com/oauth/authorize?response_type=code'
-        redirect_uri = 'https://oz-02-main-04.xyz/users/kakao/callback'
+        redirect_uri = 'http://54.180.86.80/users/kakao/callback'
         # redirect_uri = 'http://localhost:8000/users/kakao/callback'
         client_id = '92ec542f65f17550dbc2fbf553c44822'
 
@@ -134,7 +134,7 @@ class KakaoCallBackView(APIView):
             response = HttpResponseRedirect('https://oz-02-main-04.xyz/users/myinfo') # 로그인 완료 시 리디렉션할 URL
             response.set_cookie('access_token', str(refresh.access_token), httponly=True, samesite='None', secure=True)
             response.set_cookie('refresh_token', str(refresh), httponly=True, samesite='None', secure=True)
-            return Response({'access_token': access_token})
+            return response
         
         else:
             return Response({'message':'카카오 계정 이메일이 없습니다.'}, status=status.HTTP_400_BAD_REQUEST)
