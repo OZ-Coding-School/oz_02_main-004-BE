@@ -34,6 +34,7 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt
       - static_volume:/usr/share/nginx/html/static/
       - media_volume:/usr/share/nginx/html/media/
+      - /var/www/html:/var/www/html
     depends_on:
       - web
     networks:
