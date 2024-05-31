@@ -191,6 +191,15 @@ CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_SAMESITE = 'Lax'
 
+
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'authorization',
+    'cookie'
+]
+
+
+
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
 ]
