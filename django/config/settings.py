@@ -192,22 +192,10 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 
-CORS_ALLOW_HEADERS = [
-    'content-type',
-    'authorization',
-    'cookie'
-]
-
-
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "https://www.oz-02-main-04.xyz",
-    "https://api.oz-02-main-04.xyz",
-    # 필요한 경우 다른 도메인 추가
-]
 
 CORS_ALLOW_ALL_ORIGINS = True
 
