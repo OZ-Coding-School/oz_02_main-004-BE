@@ -75,7 +75,7 @@ class MyInfoView(APIView):
 class KakaoView(APIView):
     def get(self, request):
         kakao_api = 'https://kauth.kakao.com/oauth/authorize?response_type=code'
-        redirect_uri = 'https://54.180.86.80:443/users/kakao/callback'
+        redirect_uri = 'https://staging-petodo-cqkexnfel-staging-petodo.vercel.app/login/callback'
         # redirect_uri = 'http://localhost:8000/users/kakao/callback'
         client_id = '92ec542f65f17550dbc2fbf553c44822'
 
@@ -86,7 +86,7 @@ class KakaoCallBackView(APIView):
         data = {
             'grant_type' : 'authorization_code',
             'client_id' : '92ec542f65f17550dbc2fbf553c44822',
-            'redirection_uri' : 'https://54.180.86.80:443/users/kakao/',
+            'redirection_uri' : 'https://staging-petodo-cqkexnfel-staging-petodo.vercel.app/login',
             # 'redirection_uri' : 'http://localhost:8000/users/kakao/',
             'code' : request.GET['code'],
             'client_secret': 'qdl4Hfn7QhS2H9l2aKiYFJdGwpkeGcc1'
