@@ -76,7 +76,8 @@ class MyInfoView(APIView):
 class KakaoView(APIView):
     def get(self, request):
         kakao_api = 'https://kauth.kakao.com/oauth/authorize?response_type=code'
-        redirect_uri = 'https://api.oz-02-main-04.xyz/api/v1/users/kakao/callback'
+        # redirect_uri = 'https://api.oz-02-main-04.xyz/api/v1/users/kakao/callback'
+        redirect_uri = 'https://www.oz-02-main-04.xyz/profile'
         # redirect_uri = 'http://localhost:8000/users/kakao/callback'
         client_id = '92ec542f65f17550dbc2fbf553c44822'
 
