@@ -128,7 +128,7 @@ class KakaoCallBackView(APIView):
             refresh = RefreshToken.for_user(user)
             
             # 쿠키에 토큰 저장 (세션 쿠키로 설정)
-            response = HttpResponseRedirect('https://54.180.86.80:443/users/myinfo') # 로그인 완료 시 리디렉션할 URL
+            response = HttpResponseRedirect('https://imexer-github-mnzs40p5w-seyoits-projects.vercel.app/profile') # 로그인 완료 시 리디렉션할 URL
             # response = HttpResponseRedirect('http://localhost:8000/users/myinfo') # 로그인 완료 시 리디렉션할 URL
             response.set_cookie('access_token', str(refresh.access_token), httponly=True, samesite='None', secure=True)
             response.set_cookie('refresh_token', str(refresh), httponly=True, samesite='None', secure=True)
