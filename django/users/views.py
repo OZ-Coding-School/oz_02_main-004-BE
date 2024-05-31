@@ -134,6 +134,7 @@ class KakaoCallBackView(APIView):
             response = HttpResponseRedirect('https://oz-02-main-04.xyz/users/myinfo') # 로그인 완료 시 리디렉션할 URL
             response.set_cookie('access_token', str(refresh.access_token), httponly=True, samesite='None', secure=True)
             response.set_cookie('refresh_token', str(refresh), httponly=True, samesite='None', secure=True)
+            response.set_cookie('user_state', str("TRUE"), httponly=True, samesite='None', secure=True)
             return response
         
         else:
