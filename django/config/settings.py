@@ -189,6 +189,7 @@ SESSION_COOKIE_SAMESITE = "Lax"
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
+    'https://www.oz-02-main-04.xyz/',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
