@@ -123,7 +123,7 @@ class KakaoCallBackView(APIView):
         data = {
             "grant_type": "authorization_code",
             "client_id": "92ec542f65f17550dbc2fbf553c44822",
-            "redirection_uri": "https://api.oz-02-main-04.xyz/api/v1/users/kakao/",
+            "redirect_uri": "https://api.oz-02-main-04.xyz/api/v1/users/kakao/",
             # 'redirection_uri' : 'http://localhost:8000/users/kakao/',
             "code": request.GET["code"],
             "client_secret": "qdl4Hfn7QhS2H9l2aKiYFJdGwpkeGcc1",
