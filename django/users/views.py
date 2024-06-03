@@ -109,7 +109,7 @@ class MyInfoView(APIView):
 class KakaoView(APIView):
     def get(self, request):
         kakao_api = "https://kauth.kakao.com/oauth/authorize?response_type=code"
-        redirect_uri = "https://oz-02-main-04.xyz/users/kakao/callback"
+        redirect_uri = "https://api.oz-02-main-04.xyz/api/v1/users/kakao/callback"
         # redirect_uri = 'http://localhost:8000/users/kakao/callback'
         client_id = "92ec542f65f17550dbc2fbf553c44822"
 
@@ -123,7 +123,7 @@ class KakaoCallBackView(APIView):
         data = {
             "grant_type": "authorization_code",
             "client_id": "92ec542f65f17550dbc2fbf553c44822",
-            "redirection_uri": "https://oz-02-main-04.xyz/users/kakao/",
+            "redirection_uri": "https://api.oz-02-main-04.xyz/api/v1/users/kakao/",
             # 'redirection_uri' : 'http://localhost:8000/users/kakao/',
             "code": request.GET["code"],
             "client_secret": "qdl4Hfn7QhS2H9l2aKiYFJdGwpkeGcc1",
@@ -168,7 +168,7 @@ class KakaoCallBackView(APIView):
             refresh = RefreshToken.for_user(user)
 
             # 쿠키에 토큰 저장 (세션 쿠키로 설정)
-            response = HttpResponseRedirect('https://imexer-github-mnzs40p5w-seyoits-projects.vercel.app/profile') # 로그인 완료 시 리디렉션할 URL
+            response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
             # response = HttpResponseRedirect('http://localhost:8000/users/myinfo') # 로그인 완료 시 리디렉션할 URL
 
             response.set_cookie('access_token', str(refresh.access_token), httponly=True, samesite='None', secure=True)
