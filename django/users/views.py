@@ -18,7 +18,6 @@ class IsStaffUser(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user and request.user.is_staff
 
-
 class UserListView(APIView):
     permission_classes = [IsStaffUser]
 
@@ -36,7 +35,6 @@ class UserListView(APIView):
             for user in users
         ]
         return Response(user_data)
-
 
 class UserDetailView(APIView):
     # 본인 확인 로직 추가
@@ -61,7 +59,6 @@ class UserDetailView(APIView):
             "로그인": user.login_method,
         }
         return Response(user_data)
-
 
 class MyInfoView(APIView):
     permission_classes = [IsAuthenticated]
@@ -105,7 +102,6 @@ class MyInfoView(APIView):
         response.delete_cookie("refresh_token")
         return response
 
-
 class KakaoView(APIView):
     def get(self, request):
         kakao_api = "https://kauth.kakao.com/oauth/authorize?response_type=code"
@@ -116,7 +112,6 @@ class KakaoView(APIView):
         return redirect(
             f"{kakao_api}&client_id={client_id}&redirect_uri={redirect_uri}"
         )
-
 
 class KakaoCallBackView(APIView):
     def get(self, request):
