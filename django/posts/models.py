@@ -3,6 +3,7 @@ from common.models import CommonModel
 from django.core.validators import URLValidator
 from users.models import User
 from django.utils import timezone
+from datetime import timedelta
 
 
 class Post(CommonModel):
@@ -37,13 +38,40 @@ class Music(CommonModel):
 
 class Timer(CommonModel):
     on_btn = models.BooleanField(default=False)
-    start = models.DateTimeField()
+    start = models.DateTimeField(default=timezone.now)
     end = models.DateTimeField(null=True, blank=True)
-    duration = models.DateTimeField(null=True, blank=True)
-    post = models.ForeignKey(
-        Post, on_delete=models.CASCADE, related_name="timers", null=True, blank=True
+    duration = models.DurationField(default=timedelta)
+    post = models.OneToOneField(
+        Post, on_delete=models.CASCADE, related_name="timer", null=True, blank=True
     )
 
     def __str__(self):
-        duration = "ongoing" if not self.end else str(self.end - self.start)
-        return f"Start: {self.start}, Duration: {duration}"
+        return f"Post: {self.post}, On/off: {self.on_btn}, Duration: {self.duration}"
+
+    def pause(self):
+        self.on_btn = False
+        self.end = timezone.now()
+        self.update_duration()
+        self.save()
+
+    def restart(self):
+        self.on_btn = True
+        self.start = timezone.now()
+        self.end = None
+        self.save()
+
+    def reset(self):
+        self.on_btn = False
+        self.end = None
+        self.duration = timedelta()
+        self.start = timezone.now()
+        self.save()
+
+    def update_duration(self):
+        if self.end:
+            self.duration += self.end - self.start
+        else:
+            self.duration += timezone.now() - self.start
+
+        # Reset start to prepare for next duration update
+        # self.start = timezone.now()

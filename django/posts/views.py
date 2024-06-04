@@ -1,5 +1,5 @@
 from django.conf import settings
-from posts.models import Post, Timer, Music
+from posts.models import Post, Timer
 from users.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
@@ -13,6 +13,8 @@ from posts.serializer import (
     PostCreateSerializer,
     SpotifySerializer,
     SongCreateSerializer,
+    TimerSerializer,
+    TimerCreateSerializer,
 )
 
 # spotify
@@ -116,7 +118,7 @@ class Spotify(APIView):
         return post.musics.first()
 
     def get(self, request, post_id):
-        # get songs from searched results (max: 50 songs)
+        # get songs' list from searched results (max: 50 songs)
         query = request.data.get("query", None)
         if not query:
             return Response({"error": "Query parameter is required!"})
@@ -194,4 +196,50 @@ class Spotify(APIView):
             )
 
         current_song.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# /timer/<int:post_id>
+class TimerView(APIView):
+    def get_post(self, post_id):
+        return get_object_or_404(Post, id=post_id)
+
+    def get(self, request, post_id):
+        post = self.get_post(post_id)
+        timer = post.timer
+        timer.update_duration()
+
+        serializer = TimerSerializer(timer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, post_id):
+        post = self.get_post(post_id)
+        serializer = TimerCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            timer = serializer.save(post=post, on_btn=True)
+            serializer = TimerSerializer(timer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_200_BAD_REQUEST)
+
+    # timer reset/pause/restart
+    def patch(self, request, post_id):
+        action = request.data.get("action", None)
+        post = self.get_post(post_id)
+        timer = post.timer
+        if action == "pause":
+            timer.pause()
+        elif action == "restart":
+            timer.restart()
+        elif action == "reset":
+            timer.reset()
+        else:
+            return Response(
+                {"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response(TimerSerializer(timer).data, status=status.HTTP_200_OK)
+
+    def delete(self, request, post_id):
+        post = self.get_post(post_id)
+        timer = post.timer
+        timer.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

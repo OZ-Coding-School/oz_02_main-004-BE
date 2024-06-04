@@ -34,3 +34,15 @@ class SongCreateSerializer(ModelSerializer):
     class Meta:
         model = Music
         fields = ("singer", "album", "title", "release_date", "song_url")
+
+
+class TimerSerializer(ModelSerializer):
+    class Meta:
+        model = Timer
+        fields = "__all__"
+
+
+class TimerCreateSerializer(ModelSerializer):
+    class Meta:
+        model = Timer
+        fields = ("on_btn", "start", "end", "duration")
