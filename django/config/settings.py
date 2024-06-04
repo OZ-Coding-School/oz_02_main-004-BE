@@ -1,7 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
-
-
+import json
 import platform
 import os
 
@@ -21,8 +20,12 @@ else:
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
+# load 'secret.json' file
+with open(os.path.join(BASE_DIR, "secret.json")) as secret_file:
+    secret_keys = json.load(secret_file)
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-wy(7)!%^)5tv3%42m*a%3430g#(9k$l#cr%yk1b^z83cuonfqk"
+SECRET_KEY = secret_keys["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -204,3 +207,8 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_ON_GET = True
 
 SITE_ID = 1
+
+
+# key management
+SPOTIPY_CLIENT_ID = secret_keys["SPOTIPY_CLIENT_ID"]
+SPOTIPY_CLIENT_SECRET = secret_keys["SPOTIPY_CLIENT_SECRET"]

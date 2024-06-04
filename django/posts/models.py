@@ -17,6 +17,10 @@ class Post(CommonModel):
         return f"ID: {self.id}, date: {self.todo_date}"
 
 
+class ToDo(CommonModel):
+    pass
+
+
 class Music(CommonModel):
     singer = models.CharField(max_length=255, default="")
     album = models.CharField(max_length=255, default="")
