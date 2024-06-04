@@ -26,7 +26,7 @@ class UserListView(APIView):
         user_data = [
             {
                 "id": user.id,
-                '닉네임': user.nickname,
+                # '닉네임': user.nickname,
                 "계정": user.email,
                 "운영진": user.is_staff,
                 "휴면회원": user.is_down,
@@ -51,7 +51,7 @@ class UserDetailView(APIView):
         user_data = {
             "id": user.id,
             "계정": user.email,
-            "닉네임": user.nickname,
+            # "닉네임": user.nickname,
             "운영진": user.is_staff,
             "휴면회원": user.is_down,
             "활동회원": user.is_active,
@@ -69,6 +69,7 @@ class MyInfoView(APIView):
         user_data = {
             "id": user.id,
             "계정": user.email,
+            # "닉네임": user.nickname,
             "운영진": user.is_staff,
             "휴면회원": user.is_down,
             "가입일자": user.created_at,
@@ -91,7 +92,6 @@ class MyInfoView(APIView):
     def withdraw(self, request):
         user = request.user
         user.is_active = False
-        user.is_paid = False
         user.is_staff = False
         user.save()
 
