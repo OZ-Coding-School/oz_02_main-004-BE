@@ -1,7 +1,19 @@
 from rest_framework.serializers import ModelSerializer, ValidationError
-from posts.models import Post, Timer, Music
+from posts.models import Post, Timer, Music, ToDo
 from users.serializers import UserSerializer
 from django.utils import timezone
+
+
+class ToDoSerializer(ModelSerializer):
+    class Meta:
+        model = ToDo
+        fields = "__all__"
+
+
+class ToDoCreateSerializer(ModelSerializer):
+    class Meta:
+        model = ToDo
+        fields = ("todo_item",)
 
 
 class PostSerializer(ModelSerializer):

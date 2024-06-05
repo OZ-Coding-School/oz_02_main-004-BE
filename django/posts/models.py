@@ -1,6 +1,7 @@
 from django.db import models
 from common.models import CommonModel
 from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 from users.models import User
 from django.utils import timezone
 from datetime import timedelta
@@ -17,9 +18,23 @@ class Post(CommonModel):
     def __str__(self):
         return f"ID: {self.id}, date: {self.todo_date}"
 
+    def update_progress(self):
+        num_items = self.items.all().count()
+        if num_items:
+            num_done = self.items.filter(done=True).count()
+            self.todo_progress = int((num_done / num_items) * 100)
+            self.save()
+        else:
+            raise ValidationError("Cannot update progress: No ToDo items found.")
+
 
 class ToDo(CommonModel):
-    pass
+    todo_item = models.CharField(max_length=255)
+    done = models.BooleanField(default=False)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="items")
+
+    def __str__(self):
+        return f"Item : {self.todo_item} Done : {self.done}"
 
 class Music(CommonModel):
     singer = models.CharField(max_length=255, default="")
@@ -66,6 +81,3 @@ class Timer(CommonModel):
             self.duration += self.end - self.start
         else:
             self.duration += timezone.now() - self.start
-
-        # Reset start to prepare for next duration update
-        # self.start = timezone.now()
