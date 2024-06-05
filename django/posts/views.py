@@ -78,9 +78,7 @@ class PostsByUser(APIView):
         target_date = request.data.get("todo_date")
         post = self.get_post(user_id=user_id, target_date=target_date)
         if not post:
-            return Response(
-                {"error": "Post Not Found"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Post Not Found"}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = PostSerializer(post, data=request.data, partial=True)
         if serializer.is_valid():
@@ -124,7 +122,6 @@ class ToDoView(APIView):
         serializer = ToDoSerializer(todos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
 # /post/todo/<int:post_id>/<int:todo_id>
 class ToDoEdit(APIView):
     # permission_classes = [IsAuthenticated]
@@ -136,9 +133,7 @@ class ToDoEdit(APIView):
         try:
             todo = post.items.get(id=todo_id)
         except ToDo.DoesNotExist:
-            return Response(
-                {"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = ToDoSerializer(todo, data=request.data, partial=True)
 
@@ -155,9 +150,7 @@ class ToDoEdit(APIView):
         try:
             todo = post.items.get(id=todo_id)
         except ToDo.DoesNotExist:
-            return Response(
-                {"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND)
         todo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

@@ -1,5 +1,6 @@
 from django.urls import path, include
-from .views import UserListView, UserDetailView, MyInfoView, KakaoView, KakaoCallBackView, KakaoLogoutView, NicknameCreateView
+from .userviews import UserListView, UserDetailView, MyInfoView
+from .kakao import KakaoView, KakaoCallBackView, KakaoLogoutView, NicknameCreateView
 
 urlpatterns = [
     path('', UserListView.as_view(), name='user-list'),
