@@ -23,7 +23,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(max_length=255, unique=True)
-    nickname = models.CharField(max_length=255, verbose_name='닉네임', unique=True, default=generate_random_nickname)
+    nickname = models.CharField(max_length=255, verbose_name='닉네임', unique=True, default=generate_random_nickname())
     # goal_content = models.TextField(null=True, blank=True, verbose_name='목표')
     # goal_deadline = models.DateTimeField(null=True, blank=True, verbose_name='데드라인')
     is_staff = models.BooleanField(default=False, verbose_name='운영진')
