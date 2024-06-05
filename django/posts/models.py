@@ -36,29 +36,23 @@ class ToDo(CommonModel):
     def __str__(self):
         return f"Item : {self.todo_item} Done : {self.done}"
 
-
 class Music(CommonModel):
     singer = models.CharField(max_length=255, default="")
     album = models.CharField(max_length=255, default="")
     title = models.CharField(max_length=255, null=False)
     release_date = models.DateField(blank=True, null=True)
-    song_url = models.CharField(
-        max_length=255, blank=True, null=True, validators=[URLValidator()]
-    )
+    song_url = models.CharField(max_length=255, blank=True, null=True, validators=[URLValidator()])
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="musics")
 
     def __str__(self):
         return f"Title: {self.title}, POST: {self.post.id}"
-
 
 class Timer(CommonModel):
     on_btn = models.BooleanField(default=False)
     start = models.DateTimeField(default=timezone.now)
     end = models.DateTimeField(null=True, blank=True)
     duration = models.DurationField(default=timedelta)
-    post = models.OneToOneField(
-        Post, on_delete=models.CASCADE, related_name="timer", null=True, blank=True
-    )
+    post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name="timer", null=True, blank=True)
 
     def __str__(self):
         return f"Post: {self.post}, On/off: {self.on_btn}, Duration: {self.duration}"

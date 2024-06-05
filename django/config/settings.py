@@ -25,7 +25,7 @@ with open(os.path.join(BASE_DIR, "secret.json")) as secret_file:
     secret_keys = json.load(secret_file)
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secret_keys["SECRET_KEY"]
+SECRET_KEY = 'django-insecure-wy(7)!%^)5tv3%42m*a%3430g#(9k$l#cr%yk1b^z83cuonfqk'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -59,6 +59,7 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.kakao",
     "corsheaders",
+    "drf_yasg",
 ]
 
 INSTALLED_APPS = SYSTEM_APPS + CUSTOM_APPS + THIRD_PARTY_APPS
@@ -184,14 +185,15 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
-CSRF_COOKIE_SAMESITE = "Lax"
-SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
+    'https://www.oz-02-main-04.xyz/',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -207,7 +209,6 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_ON_GET = True
 
 SITE_ID = 1
-
 
 # key management
 SPOTIPY_CLIENT_ID = secret_keys["SPOTIPY_CLIENT_ID"]
