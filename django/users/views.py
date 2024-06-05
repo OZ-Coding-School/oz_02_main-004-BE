@@ -174,7 +174,7 @@ class KakaoCallBackView(APIView):
 
             # 쿠키에 토큰 저장 (세션 쿠키로 설정)
             if not user.nickname:
-                response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
+                response = HttpResponseRedirect('https://api.oz-02-main-04.xyz/api/v1/users/nickname') # 로그인 완료 시 리디렉션할 URL
                 # response = HttpResponseRedirect('http://localhost:8000/api/v1/users/nickname') # 로그인 완료 시 리디렉션할 URL
             else:
                 response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
