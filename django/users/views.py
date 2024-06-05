@@ -6,8 +6,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework_simplejwt.tokens import RefreshToken
-import requests
+import requests, random, string
 from .serializers import CreateUserSerializer
+from django.db import IntegrityError
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -22,14 +23,13 @@ class IsStaffUser(permissions.BasePermission):
 
 class UserListView(APIView):
     permission_classes = [IsStaffUser]
-
     @swagger_auto_schema(auto_schema=None)
     def get(self, request):
         users = User.objects.all()
         user_data = [
             {
                 "id": user.id,
-                # '닉네임': user.nickname,
+                '닉네임': user.nickname,
                 "계정": user.email,
                 "운영진": user.is_staff,
                 "휴면회원": user.is_down,
@@ -45,17 +45,12 @@ class UserDetailView(APIView):
     # 본인 확인 로직 추가
     def get(self, request, pk):
         user = get_object_or_404(User, pk=pk)
-        if (
-            request.user != user and not request.user.is_staff
-        ):  # 본인 및 운영진만 조회가능
-            return Response(
-                {"message": "본인의 정보만 확인할 수 있습니다."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        if (request.user != user and not request.user.is_staff):  # 본인 및 운영진만 조회가능
+            return Response({"message": "본인의 정보만 확인할 수 있습니다."}, status=status.HTTP_403_FORBIDDEN,)
         user_data = {
             "id": user.id,
             "계정": user.email,
-            # "닉네임": user.nickname,
+            "닉네임": user.nickname,
             "운영진": user.is_staff,
             "휴면회원": user.is_down,
             "활동회원": user.is_active,
@@ -66,9 +61,7 @@ class UserDetailView(APIView):
         return Response(user_data)
 
 class MyInfoView(APIView):
-
     permission_classes = [IsAuthenticated]
-
     @swagger_auto_schema(
         responses={200: "내 정보 조회 성공", 401: "로그인이 필요합니다."},
         operation_id="내 정보 조회 API",
@@ -79,14 +72,13 @@ class MyInfoView(APIView):
         user_data = {
             "id": user.id,
             "계정": user.email,
-            # "닉네임": user.nickname,
+            "닉네임": user.nickname,
             "운영진": user.is_staff,
             "휴면회원": user.is_down,
             "가입일자": user.created_at,
             "수정일자": user.updated_at,
             "로그인": user.login_method,
         }
-
         return Response(user_data)
 
     @swagger_auto_schema(
@@ -102,13 +94,10 @@ class MyInfoView(APIView):
     )
     def post(self, request):
         action = request.data.get("action")
-
         if action == "withdraw":
             return self.withdraw(request)
         else:
-            return Response(
-                {"message": "잘못된 요청입니다."}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"message": "잘못된 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
 
     def withdraw(self, request):
         user = request.user
@@ -117,9 +106,7 @@ class MyInfoView(APIView):
         user.save()
 
         # 회원탈퇴 후 토큰 삭제
-        response = Response(
-            {"message": "회원탈퇴가 완료되었습니다."}, status=status.HTTP_204_NO_CONTENT
-        )
+        response = Response({"message": "회원탈퇴가 완료되었습니다."}, status=status.HTTP_204_NO_CONTENT)
         response.delete_cookie("access_token")
         response.delete_cookie("refresh_token")
         return response
@@ -132,15 +119,10 @@ class KakaoView(APIView):
     )
     def get(self, request):
         kakao_api = "https://kauth.kakao.com/oauth/authorize?response_type=code"
-
-        redirect_uri = "https://api.oz-02-main-04.xyz/api/v1/users/kakao/callback"
-        # redirect_uri = 'http://localhost:8000/api/v1/users/kakao/callback'
+        # redirect_uri = "https://api.oz-02-main-04.xyz/api/v1/users/kakao/callback"
+        redirect_uri = 'http://localhost:8000/api/v1/users/kakao/callback'
         client_id = "92ec542f65f17550dbc2fbf553c44822"
-
-
-        return redirect(
-            f"{kakao_api}&client_id={client_id}&redirect_uri={redirect_uri}"
-        )
+        return redirect(f"{kakao_api}&client_id={client_id}&redirect_uri={redirect_uri}")
 
 class KakaoCallBackView(APIView):
     @swagger_auto_schema(auto_schema=None)
@@ -148,8 +130,8 @@ class KakaoCallBackView(APIView):
         data = {
             "grant_type": "authorization_code",
             "client_id": "92ec542f65f17550dbc2fbf553c44822",
-            "redirection_uri": "https://api.oz-02-main-04.xyz/api/v1/users/kakao/",
-            # 'redirection_uri' : 'http://localhost:8000/api/v1/users/kakao/',
+            # "redirection_uri": "https://api.oz-02-main-04.xyz/api/v1/users/kakao/",
+            'redirection_uri' : 'http://localhost:8000/api/v1/users/kakao/',
             "code": request.GET["code"],
             "client_secret": "qdl4Hfn7QhS2H9l2aKiYFJdGwpkeGcc1",
         }
@@ -183,10 +165,7 @@ class KakaoCallBackView(APIView):
                     user.set_unusable_password()
                     user.save()
                 else:
-                    return Response(
-                        {"message": "잘못된 요청입니다.", "errors": serializer.errors},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
+                    return Response({"message": "잘못된 요청입니다.", "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST,)
 
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
@@ -194,38 +173,64 @@ class KakaoCallBackView(APIView):
             refresh = RefreshToken.for_user(user)
 
             # 쿠키에 토큰 저장 (세션 쿠키로 설정)
-
-            response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
-            # response = HttpResponseRedirect('http://localhost:8000/api/v1/users/') # 로그인 완료 시 리디렉션할 URL
+            if not user.nickname:
+                # response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
+                response = HttpResponseRedirect('http://localhost:8000/api/v1/users/nickname') # 로그인 완료 시 리디렉션할 URL
+            else:
+                # response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
+                response = HttpResponseRedirect('http://localhost:8000/api/v1/users/myinfo')
 
             # 배포 환경에서만 secure=True와 samesite='None' 설정
             secure_cookie = request.is_secure()
-
             response.set_cookie('access_token', str(refresh.access_token), httponly=True, samesite='None' if secure_cookie else 'Lax', secure=secure_cookie)
             response.set_cookie('refresh_token', str(refresh), httponly=True, samesite='None' if secure_cookie else 'Lax', secure=secure_cookie)
-
-
             return response
-
         else:
-            return Response(
-                {"message": "카카오 계정 이메일이 없습니다."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response({"message": "카카오 계정 이메일이 없습니다."}, status=status.HTTP_400_BAD_REQUEST,)
+
+class NicknameCreateView(APIView):
+    def generate_random_nickname(self, length=8):
+        korean_range = [(0xAC00, 0xD7A3)]
+        result = []
+
+        for a in range(length):
+            choice = random.choice([
+                random.choice(string.ascii_letters),
+                random.choice(string.digits),
+                chr(random.choice([random.randint(low, high) for low, high in korean_range]))
+            ])
+            result.append(choice)
+        return ''.join(result)
+    
+    def post(self, request):
+        user = request.user
+        nickname = request.data.get('nickname')
+
+        # 닉네임이 없으면 무작위 닉네임 생성
+        if not nickname:
+            nickname = self.generate_random_nickname()
+
+        # 닉네임 유효성 검사
+        if len(nickname) > 8:
+            return Response({'message': '닉네임은 최대 8자까지만 가능합니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not nickname.isalnum():
+            return Response({'message': '닉네임은 한글, 영문, 숫자로 8자만 가능합니다.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 닉네임 중복체크
+        try:
+            user.nickname = nickname
+            user.save()
+        except IntegrityError:
+            return Response({'message': '이미 존재하는 닉네임입니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        # return redirect('https://www.oz-02-main-04.xyz/profile')
+        return redirect('http://localhost:8000/api/v1/users/myinfo')
 
 class KakaoLogoutView(APIView):
     permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        responses={204: "로그아웃 되었습니다."},
-        operation_id="카카오 로그아웃 API",
-        operation_description="카카오 로그아웃을 진행합니다.",
-    )
+    @swagger_auto_schema(responses={204: "로그아웃 되었습니다."}, operation_id="카카오 로그아웃 API", operation_description="카카오 로그아웃을 진행합니다.",)
     def post(self, request):
         logout(request)
-        response = Response(
-            {"message": "로그아웃 되었습니다."}, status=status.HTTP_204_NO_CONTENT
-        )
+        response = Response({"message": "로그아웃 되었습니다."}, status=status.HTTP_204_NO_CONTENT)
         response.delete_cookie("access_token")
         response.delete_cookie("refresh_token")
         return response
