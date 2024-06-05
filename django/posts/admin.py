@@ -10,11 +10,9 @@ class PostAdmin(admin.ModelAdmin):
     # ordering = ("question_id",)
     pass
 
-
 @admin.register(Timer)
 class TimerAdmin(admin.ModelAdmin):
     pass
-
 
 @admin.register(Music)
 class MusicAdmin(admin.ModelAdmin):

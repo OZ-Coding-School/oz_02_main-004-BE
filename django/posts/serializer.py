@@ -23,7 +23,6 @@ class PostSerializer(ModelSerializer):
         fields = "__all__"
         # depth = 1
 
-
 class PostCreateSerializer(ModelSerializer):
     class Meta:
         model = Post
@@ -35,24 +34,20 @@ class PostCreateSerializer(ModelSerializer):
             raise ValidationError("todo date cannot be in the past.")
         return value
 
-
 class SpotifySerializer(ModelSerializer):
     class Meta:
         model = Music
         fields = "__all__"
-
 
 class SongCreateSerializer(ModelSerializer):
     class Meta:
         model = Music
         fields = ("singer", "album", "title", "release_date", "song_url")
 
-
 class TimerSerializer(ModelSerializer):
     class Meta:
         model = Timer
         fields = "__all__"
-
 
 class TimerCreateSerializer(ModelSerializer):
     class Meta:
