@@ -18,7 +18,6 @@ class IsStaffUser(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user and request.user.is_staff
 
-
 class UserListView(APIView):
     permission_classes = [IsStaffUser]
 
@@ -27,6 +26,7 @@ class UserListView(APIView):
         user_data = [
             {
                 "id": user.id,
+                # '닉네임': user.nickname,
                 "계정": user.email,
                 "운영진": user.is_staff,
                 "휴면회원": user.is_down,
@@ -36,7 +36,6 @@ class UserListView(APIView):
             for user in users
         ]
         return Response(user_data)
-
 
 class UserDetailView(APIView):
     # 본인 확인 로직 추가
@@ -52,7 +51,7 @@ class UserDetailView(APIView):
         user_data = {
             "id": user.id,
             "계정": user.email,
-            "닉네임": user.nickname,
+            # "닉네임": user.nickname,
             "운영진": user.is_staff,
             "휴면회원": user.is_down,
             "활동회원": user.is_active,
@@ -62,7 +61,6 @@ class UserDetailView(APIView):
         }
         return Response(user_data)
 
-
 class MyInfoView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -71,6 +69,7 @@ class MyInfoView(APIView):
         user_data = {
             "id": user.id,
             "계정": user.email,
+            # "닉네임": user.nickname,
             "운영진": user.is_staff,
             "휴면회원": user.is_down,
             "가입일자": user.created_at,
@@ -93,7 +92,6 @@ class MyInfoView(APIView):
     def withdraw(self, request):
         user = request.user
         user.is_active = False
-        user.is_paid = False
         user.is_staff = False
         user.save()
 
@@ -105,18 +103,16 @@ class MyInfoView(APIView):
         response.delete_cookie("refresh_token")
         return response
 
-
 class KakaoView(APIView):
     def get(self, request):
         kakao_api = "https://kauth.kakao.com/oauth/authorize?response_type=code"
         redirect_uri = "https://api.oz-02-main-04.xyz/api/v1/users/kakao/callback"
-        # redirect_uri = 'http://localhost:8000/users/kakao/callback'
+        # redirect_uri = 'http://localhost:8000/api/v1/users/kakao/callback'
         client_id = "92ec542f65f17550dbc2fbf553c44822"
 
         return redirect(
             f"{kakao_api}&client_id={client_id}&redirect_uri={redirect_uri}"
         )
-
 
 class KakaoCallBackView(APIView):
     def get(self, request):
@@ -124,19 +120,20 @@ class KakaoCallBackView(APIView):
             "grant_type": "authorization_code",
             "client_id": "92ec542f65f17550dbc2fbf553c44822",
             "redirection_uri": "https://api.oz-02-main-04.xyz/api/v1/users/kakao/",
-            # 'redirection_uri' : 'http://localhost:8000/users/kakao/',
+            # 'redirection_uri' : 'http://localhost:8000/api/v1/users/kakao/',
             "code": request.GET["code"],
             "client_secret": "qdl4Hfn7QhS2H9l2aKiYFJdGwpkeGcc1",
         }
 
         kakao_token_api = "https://kauth.kakao.com/oauth/token"
         access_token = requests.post(kakao_token_api, data=data).json()["access_token"]
+        # print(access_token)
 
         # 카카오 토큰 정보 가져오기
         kakao_user_api = "https://kapi.kakao.com/v2/user/me"
         header = {"Authorization": f"Bearer {access_token}"}
         kakao_user = requests.get(kakao_user_api, headers=header).json()
-        print(kakao_user)  # 제대로 받아오는지 테스트를 위한 프린트 요청
+        # print(kakao_user)  # 제대로 받아오는지 테스트를 위한 프린트 요청
 
         # 카카오 계정으로 사용자 조회 또는 생성
         email = kakao_user.get("kakao_account", {}).get("email", None)
@@ -148,10 +145,10 @@ class KakaoCallBackView(APIView):
                 if not user.is_active:
                     user.is_active = True
                     user.save()
+
             # 사용자가 존재하지 않으면 새 사용자 생성
             except User.DoesNotExist:
                 serializer = CreateUserSerializer(data={"email": email})
-
                 if serializer.is_valid():
                     user = serializer.save()
                     user.set_unusable_password()
@@ -169,10 +166,13 @@ class KakaoCallBackView(APIView):
 
             # 쿠키에 토큰 저장 (세션 쿠키로 설정)
             response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
-            # response = HttpResponseRedirect('http://localhost:8000/users/myinfo') # 로그인 완료 시 리디렉션할 URL
+            # response = HttpResponseRedirect('http://localhost:8000/api/v1/users/') # 로그인 완료 시 리디렉션할 URL
 
-            response.set_cookie('access_token', str(refresh.access_token), httponly=True, samesite='None', secure=True)
-            response.set_cookie('refresh_token', str(refresh), httponly=True, samesite='None', secure=True)
+            # 배포 환경에서만 secure=True와 samesite='None' 설정
+            secure_cookie = request.is_secure()
+
+            response.set_cookie('access_token', str(refresh.access_token), httponly=True, samesite='None' if secure_cookie else 'Lax', secure=secure_cookie)
+            response.set_cookie('refresh_token', str(refresh), httponly=True, samesite='None' if secure_cookie else 'Lax', secure=secure_cookie)
 
             return response
 
@@ -181,7 +181,6 @@ class KakaoCallBackView(APIView):
                 {"message": "카카오 계정 이메일이 없습니다."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
 
 class KakaoLogoutView(APIView):
     permission_classes = [IsAuthenticated]
