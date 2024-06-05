@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 from .serializers import CreateUserSerializer
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 # Create your views here.
 User = get_user_model()
@@ -21,6 +23,7 @@ class IsStaffUser(permissions.BasePermission):
 class UserListView(APIView):
     permission_classes = [IsStaffUser]
 
+    @swagger_auto_schema(auto_schema=None)
     def get(self, request):
         users = User.objects.all()
         user_data = [
@@ -38,6 +41,7 @@ class UserListView(APIView):
         return Response(user_data)
 
 class UserDetailView(APIView):
+    @swagger_auto_schema(auto_schema=None)
     # 본인 확인 로직 추가
     def get(self, request, pk):
         user = get_object_or_404(User, pk=pk)
@@ -62,8 +66,14 @@ class UserDetailView(APIView):
         return Response(user_data)
 
 class MyInfoView(APIView):
+
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={200: "내 정보 조회 성공", 401: "로그인이 필요합니다."},
+        operation_id="내 정보 조회 API",
+        operation_description="내 정보를 조회합니다.",
+    )
     def get(self, request):
         user = request.user
         user_data = {
@@ -79,6 +89,17 @@ class MyInfoView(APIView):
 
         return Response(user_data)
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={"action": openapi.Schema(type=openapi.TYPE_STRING)},
+            required=["action"],
+            example={"action": "withdraw"},
+        ),
+        responses={204: "회원탈퇴가 완료되었습니다.", 400: "잘못된 요청입니다."},
+        operation_id="회원탈퇴 요청 API",
+        operation_description="회원탈퇴를 요청합니다. \n\n Post 요청을 해주세요 ",
+    )
     def post(self, request):
         action = request.data.get("action")
 
@@ -104,17 +125,25 @@ class MyInfoView(APIView):
         return response
 
 class KakaoView(APIView):
+    @swagger_auto_schema(
+        responses={302: "카카오 로그인 페이지로 이동합니다."},
+        operation_id="카카오 로그인 API",
+        operation_description="카카오 로그인 페이지로 이동합니다. \n\n Get 요청을 해주세요 \n\n따로 입력받을 파라미터는 없습니다.",
+    )
     def get(self, request):
         kakao_api = "https://kauth.kakao.com/oauth/authorize?response_type=code"
+
         redirect_uri = "https://api.oz-02-main-04.xyz/api/v1/users/kakao/callback"
         # redirect_uri = 'http://localhost:8000/api/v1/users/kakao/callback'
         client_id = "92ec542f65f17550dbc2fbf553c44822"
+
 
         return redirect(
             f"{kakao_api}&client_id={client_id}&redirect_uri={redirect_uri}"
         )
 
 class KakaoCallBackView(APIView):
+    @swagger_auto_schema(auto_schema=None)
     def get(self, request):
         data = {
             "grant_type": "authorization_code",
@@ -165,6 +194,7 @@ class KakaoCallBackView(APIView):
             refresh = RefreshToken.for_user(user)
 
             # 쿠키에 토큰 저장 (세션 쿠키로 설정)
+
             response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
             # response = HttpResponseRedirect('http://localhost:8000/api/v1/users/') # 로그인 완료 시 리디렉션할 URL
 
@@ -173,6 +203,7 @@ class KakaoCallBackView(APIView):
 
             response.set_cookie('access_token', str(refresh.access_token), httponly=True, samesite='None' if secure_cookie else 'Lax', secure=secure_cookie)
             response.set_cookie('refresh_token', str(refresh), httponly=True, samesite='None' if secure_cookie else 'Lax', secure=secure_cookie)
+
 
             return response
 
@@ -185,6 +216,11 @@ class KakaoCallBackView(APIView):
 class KakaoLogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={204: "로그아웃 되었습니다."},
+        operation_id="카카오 로그아웃 API",
+        operation_description="카카오 로그아웃을 진행합니다.",
+    )
     def post(self, request):
         logout(request)
         response = Response(
