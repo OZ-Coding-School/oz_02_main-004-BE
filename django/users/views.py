@@ -15,7 +15,6 @@ from drf_yasg import openapi
 # Create your views here.
 User = get_user_model()
 
-
 # 퍼미션 관련 커스텀으로 운영진 퍼미션 생성 및 추가
 class IsStaffUser(permissions.BasePermission):
     def has_permission(self, request, view):
