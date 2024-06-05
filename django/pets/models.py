@@ -22,7 +22,7 @@ class PetRating(CommonModel):
     point = models.PositiveIntegerField(verbose_name='포인트', default=0)
 
     def __str__(self):
-        return f"{self.pet.name} - {self.rating_type}"
+        return f'{self.pet.name} - {self.rating_type}'
 
 class Snack(CommonModel):
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='snacks', verbose_name='펫 ID')
@@ -45,7 +45,7 @@ class Background(CommonModel):
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='backgrounds', verbose_name='펫 ID')
 
     def __str__(self):
-        return f"Background for {self.pet.name}"
+        return f'Background for {self.pet.name}'
 
 class ItemList(CommonModel):
     clothes = models.ForeignKey(Clothes, on_delete=models.CASCADE, related_name='item_lists', null=True, blank=True, verbose_name='Clothes ID')
@@ -54,4 +54,4 @@ class ItemList(CommonModel):
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='item_lists', verbose_name='펫 ID')
 
     def __str__(self):
-        return f"Item List for {self.pet.name}"
+        return f'Item List for {self.pet.name}'
