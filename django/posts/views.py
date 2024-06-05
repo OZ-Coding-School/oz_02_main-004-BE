@@ -29,7 +29,6 @@ from spotipy.oauth2 import SpotifyClientCredentials
 class PostList(APIView):
     # todo: 관리자만 접근 가능하도록 변경할것
     # permission_classes = [IsAuthenticated, IsAdminUser]
-    # authentication_classes = [JWTAuthentication]
 
     # 전체 post list
     def get(self, request):
@@ -41,7 +40,6 @@ class PostList(APIView):
 # /post/<int:user_id>
 class PostsByUser(APIView):
     # todo: 로그인한 해당 유저만 접근가능
-    # authentication_classes = [JWTAuthentication]
     # permission_classes = [IsAuthenticated]
 
     def get_user(self, user_id):
@@ -135,7 +133,6 @@ class ToDoView(APIView):
 
 # /post/todo/<int:post_id>/<int:todo_id>
 class ToDoEdit(APIView):
-    # authentication_classes = [JWTAuthentication]
     # permission_classes = [IsAuthenticated]
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)
