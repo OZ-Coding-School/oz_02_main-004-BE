@@ -1,7 +1,7 @@
 from django.db import models
 
 # 공통 사용 모델클레스
-class CommonModel(models.Models):
+class CommonModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True) # 해당 object 생성된 시간 기준
     updated_at = models.DateTimeField(auto_now=True) # 해당 object 업데이트된 시간 기준
 
