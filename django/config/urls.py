@@ -7,10 +7,10 @@ from rest_framework import permissions
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="My Project API",
+        title="Petodo API",
         default_version="v1",
-        description="API documentation for My Project",
-        terms_of_service="https://www.google.com/policies/terms/",
+        description="API documentation for Team4. Project",
+        terms_of_service="https://www.oz-02-main-04.xyz/",
         contact=openapi.Contact(email="contact@example.com"),
         license=openapi.License(name="BSD License"),
     ),

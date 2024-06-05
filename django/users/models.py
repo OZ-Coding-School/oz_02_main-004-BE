@@ -8,7 +8,6 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('이메일 주소는 필수 입력 사항입니다.')                
         user = self.model(email=self.normalize_email(email), **kwargs)
-
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -23,7 +22,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(max_length=255, unique=True)
-    # nickname = models.CharField(max_length=255, verbose_name='닉네임', unique=True)
+    nickname = models.CharField(max_length=255, verbose_name='닉네임', unique=True, default='')
     # goal_content = models.TextField(null=True, blank=True, verbose_name='목표')
     # goal_deadline = models.DateTimeField(null=True, blank=True, verbose_name='데드라인')
     is_staff = models.BooleanField(default=False, verbose_name='운영진')
