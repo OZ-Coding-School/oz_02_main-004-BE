@@ -188,18 +188,22 @@ class KakaoCallBackView(APIView):
             return Response({"message": "카카오 계정 이메일이 없습니다."}, status=status.HTTP_400_BAD_REQUEST,)
 
 class NicknameCreateView(APIView):
-    def generate_random_nickname(self, length=8):
-        korean_range = [(0xAC00, 0xD7A3)]
-        result = []
-
-        for a in range(length):
-            choice = random.choice([
-                random.choice(string.ascii_letters),
-                random.choice(string.digits),
-                chr(random.choice([random.randint(low, high) for low, high in korean_range]))
-            ])
-            result.append(choice)
-        return ''.join(result)
+    def generate_random_nickname():
+        words = [
+            "사과", "바나나", "오렌지", "포도", "딸기", "키위", "복숭아", "망고", "레몬", "라임",
+            "수박", "멜론", "자두", "블루베리", "라즈베리", "크랜베리", "체리", "귤", "감", "배",
+            "파인애플", "코코넛", "아보카도", "석류", "무화과", "구아바", "파파야", "두리안", "망고스틴", "잭프루트",
+            "스타프루트", "패션프루트", "드래곤프루트", "산딸기", "복분자", "홍시", "모과", "홍옥", "레드애플", "그린애플",
+            "홍자두", "황금자두", "화이트체리", "다크체리", "샤인머스캣", "캠벨포도", "청포도", "레드포도", "블랙포도", "루비포도",
+            "머스크멜론", "캔탈루프", "허니듀", "갈리아멜론", "카사바", "마라쿠자", "피타야", "페피노", "사보체", "람부탄",
+            "랑사트", "살라크", "몽키애플", "자몽", "스위티", "오렌지레몬", "선플라워", "러브체리", "골든베리", "산수유",
+            "석류", "홍매실", "청매실", "백도", "황도", "후루야마", "사타모", "야마모모", "크림슨피", "루비레드",
+            "핫핑크", "아이보리", "라일락", "올리브", "포레스트", "세이지", "스칼렛", "터쿼이즈", "사파이어", "에메랄드",
+            "옥", "진주", "다이아몬드", "루비", "토파즈", "오팔", "라피스라줄리", "가넷", "시트린", "피어리스"
+        ]
+        random_word = random.choice(words)
+        random_suffix = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+        return random_word + random_suffix
     
     def post(self, request):
         user = request.user
