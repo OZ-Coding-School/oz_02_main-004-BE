@@ -6,7 +6,7 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all(), message='이미 존재하는 주소입니다.')])
-    nickname = serializers.CharField()    
+    nickname = serializers.CharField(validators=[UniqueValidator(queryset=User.objects.all(), message='이미 존재하는 닉네임입니다.')])
 
     class Meta:
         model = User
@@ -15,10 +15,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CreateUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all(), message='이미 존재하는 주소입니다.')])
+    nickname = serializers.CharField(validators=[UniqueValidator(queryset=User.objects.all(), message='이미 존재하는 닉네임입니다.')])
 
     class Meta:
         model = User
-        fields = ['email']
+        fields = ['email', 'nickname']
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
