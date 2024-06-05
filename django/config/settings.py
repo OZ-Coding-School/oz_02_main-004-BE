@@ -47,6 +47,7 @@ CUSTOM_APPS = [
     "common.apps.CommonConfig",
     "users.apps.UsersConfig",
     "posts.apps.PostsConfig",
+    "pets.apps.PetsConfig",
 ]
 
 THIRD_PARTY_APPS = [

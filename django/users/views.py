@@ -11,7 +11,7 @@ from .serializers import CreateUserSerializer
 from django.db import IntegrityError
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
+from users.utils  import generate_random_nickname
 # Create your views here.
 User = get_user_model()
 
@@ -158,7 +158,7 @@ class KakaoCallBackView(APIView):
 
             # 사용자가 존재하지 않으면 새 사용자 생성
             except User.DoesNotExist:
-                serializer = CreateUserSerializer(data={"email": email})
+                serializer = CreateUserSerializer(data={"email": email, "nickname": generate_random_nickname})
                 if serializer.is_valid():
                     user = serializer.save()
                     user.set_unusable_password()
