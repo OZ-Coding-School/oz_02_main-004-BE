@@ -1,12 +1,12 @@
 from django.conf import settings
-from posts.models import Post, Timer
+from posts.models import Post, Timer, ToDo
 from users.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from posts.serializer import (
     PostSerializer,
@@ -15,9 +15,12 @@ from posts.serializer import (
     SongCreateSerializer,
     TimerSerializer,
     TimerCreateSerializer,
+    ToDoSerializer,
+    ToDoCreateSerializer,
 )
 
 # spotify
+# reference : https://spotipy.readthedocs.io/en/2.24.0/#examples
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -25,7 +28,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 # /post/list
 class PostList(APIView):
     # todo: 관리자만 접근 가능하도록 변경할것
-    # permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
     # authentication_classes = [JWTAuthentication]
 
     # 전체 post list
@@ -44,6 +47,9 @@ class PostsByUser(APIView):
     def get_user(self, user_id):
         return get_object_or_404(User, id=user_id)
 
+    def check_todo_exist(self):
+        pass
+
     # get post list written by a certain user
     def get_posts_by_user(self, user_id):
         user = self.get_user(user_id)
@@ -55,6 +61,9 @@ class PostsByUser(APIView):
         return Post.objects.filter(user=user, todo_date=target_date).first()
 
     def get(self, request, user_id):
+        # if request.user.id != user_id:
+        #     return Response({"error": "You do not have permission to access these posts."}, status=status.HTTP_403_FORBIDDEN)
+
         posts = self.get_posts_by_user(user_id)
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -76,6 +85,7 @@ class PostsByUser(APIView):
             return Response(
                 {"error": "Post Not Found"}, status=status.HTTP_400_BAD_REQUEST
             )
+
         serializer = PostSerializer(post, data=request.data, partial=True)
         if serializer.is_valid():
             post = serializer.save()
@@ -94,6 +104,70 @@ class PostsByUser(APIView):
             )
 
         post.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# /post/todo/<int:post_id>
+class ToDoView(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
+    def get_post(self, post_id):
+        return get_object_or_404(Post, id=post_id)
+
+    def post(self, request, post_id):
+        post = self.get_post(post_id)
+        # if request.user != post.user:
+        #     return Response({"error": "You do not have permission to add a todo to this post."}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = ToDoCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            todo = serializer.save(post=post)
+            serializer = ToDoSerializer(todo)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_200_BAD_REQUEST)
+
+    def get(self, request, post_id):
+        post = self.get_post(post_id)
+        todos = post.items.all()
+        serializer = ToDoSerializer(todos, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# /post/todo/<int:post_id>/<int:todo_id>
+class ToDoEdit(APIView):
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
+    def get_post(self, post_id):
+        return get_object_or_404(Post, id=post_id)
+
+    def put(self, request, post_id, todo_id):
+        post = self.get_post(post_id)
+        try:
+            todo = post.items.get(id=todo_id)
+        except ToDo.DoesNotExist:
+            return Response(
+                {"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = ToDoSerializer(todo, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            todo = serializer.save()
+            # update todo_progress after editing todo_item
+            post.update_progress()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, post_id, todo_id):
+        post = self.get_post(post_id)
+        try:
+            todo = post.items.get(id=todo_id)
+        except ToDo.DoesNotExist:
+            return Response(
+                {"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+        todo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -125,7 +199,7 @@ class Spotify(APIView):
 
         try:
             post = self.get_post(post_id)
-            results = self.sp.search(q=query, type="track", limit=50)
+            results = self.sp.search(q=query, type="track", limit=50, market="KR")
             tracks = []
             for track in results["tracks"]["items"]:
                 track_data = {
@@ -133,7 +207,9 @@ class Spotify(APIView):
                     "release_date": track["album"]["release_date"],
                     "singer": track["artists"][0]["name"],
                     "title": track["name"],
-                    "song_url": track["preview_url"],
+                    "song_url": track[
+                        "preview_url"
+                    ],  # spotify에서 불러올때 None 값이 존재함
                     "post": post.id,
                 }
                 serializer = SpotifySerializer(data=track_data)
