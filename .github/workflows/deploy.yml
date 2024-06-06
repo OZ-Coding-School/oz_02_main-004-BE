@@ -22,6 +22,7 @@ jobs:
         port: ${{ secrets.AWS_SSH_PORT }}
         script: |
             cd ~/oz_02_main-004-BE
+            git stash
             git switch develop
             git pull origin develop
             cd django
