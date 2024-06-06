@@ -4,6 +4,8 @@ import json
 import platform
 import os
 
+#cicd 머지 test
+
 # 개발환경과 서버환경 구분을 위한 변수
 platform_index = platform.system()
 # Linux : 서버 환경
