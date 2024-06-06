@@ -170,7 +170,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-        # 리프레시 토큰을 갱신할 때마다 새 토큰을 생성하지 않도록 설정합니다.
+    # 리프레시 토큰을 갱신할 때마다 새 토큰을 생성하지 않도록 설정합니다.
     "ROTATE_REFRESH_TOKENS": False,
     # 토큰을 갱신한 후 이전 토큰을 블랙리스트에 추가합니다.
     "BLACKLIST_AFTER_ROTATION": True,

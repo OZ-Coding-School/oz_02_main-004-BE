@@ -134,16 +134,11 @@ class NicknameCreateView(APIView):
         # return redirect('http://localhost:8000/api/v1/users/myinfo')
 
 class KakaoLogoutView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(responses={204: '로그아웃 되었습니다.'}, operation_id='카카오 로그아웃 API', operation_description='카카오 로그아웃을 진행합니다.',)
     def post(self, request):
-        print(1)
         logout(request)
-        print(2)
         response = Response({'message': '로그아웃 되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
-        print(3)
         response.delete_cookie('access_token')
-        print(4)
         response.delete_cookie('refresh_token')
-        print(response)
         return response
