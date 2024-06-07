@@ -194,7 +194,7 @@ class Spotify(APIView):
         post = self.get_post(post_id=post_id)
         return post.musics.first()
     
-    @swagger_auto_schema(request_body=SpotifySerializer)
+    @swagger_auto_schema(query_serializer=SpotifySerializer)
     def get(self, request, post_id):
         # get songs' list from searched results (max: 50 songs)
         query = request.data.get("query", None)
@@ -307,7 +307,7 @@ class TimerView(APIView):
         return Response(serializer.errors, status=status.HTTP_200_BAD_REQUEST)
 
     # timer reset/pause/restart
-    @swagger_auto_schema(request_body=TimerSerializer)
+    @swagger_auto_schema(request_body=SpotifySerializer)
     def patch(self, request, post_id):
         action = request.data.get("action", None)
         post = self.get_post(post_id)
