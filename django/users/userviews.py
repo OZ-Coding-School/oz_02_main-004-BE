@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from django.db import IntegrityError
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, permissions
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404, redirect
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -51,25 +52,27 @@ class MyInfoView(APIView):
     @swagger_auto_schema(
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            properties={'action': openapi.Schema(type=openapi.TYPE_STRING)},
+            properties={'action': openapi.Schema(type=openapi.TYPE_STRING),
+                        'nickname': openapi.Schema(type=openapi.TYPE_STRING, description='새로운 닉네임')},
             required=['action'],
-            example={'action': 'withdraw'},
+            example={'action': 'withdraw', 'nickname':'newNickname'},
         ),
         responses={204: '회원탈퇴가 완료되었습니다.', 400: '잘못된 요청입니다.'},
-        operation_id='회원탈퇴 요청 API',
-        operation_description='회원탈퇴를 요청합니다. \n\n Post 요청을 해주세요 ',
+        operation_id='회원정보 수정 API',
+        operation_description='회원정보 수정을 요청합니다. \n\n Post 요청을 해주세요 ',
     )
     def post(self, request):
         action = request.data.get('action')
         if action == 'withdraw':
             return self.withdraw(request)
+        elif action == 'change_nickname':
+            return self.change_nickname(request)
         else:
             return Response({'message': '잘못된 요청입니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
     def withdraw(self, request):
         user = request.user
-        user.is_active = False
-        user.is_staff = False
+        user.is_active = False        
         user.save()
 
         # 회원탈퇴 후 토큰 삭제
@@ -77,3 +80,21 @@ class MyInfoView(APIView):
         response.delete_cookie('access_token')
         response.delete_cookie('refresh_token')
         return response
+    
+    def change_nickname(self, request):
+        user = request.user
+        nickname = request.data.get('nickname')
+
+        # 닉네임 유효성 검사
+        if len(nickname) > 8:
+            return Response({'message': '닉네임은 최대 8자까지만 가능합니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not nickname.isalnum():
+            return Response({'message': '닉네임은 한글, 영문, 숫자로 구성되어야 합니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 닉네임 중복체크 후 저장
+        try:
+            user.nickname = nickname
+            user.save()
+            return Response({'message': '닉네임이 변경되었습니다.'}, status=status.HTTP_200_OK)
+        except IntegrityError:
+            return Response({'message': '이미 존재하는 닉네임입니다.'}, status=status.HTTP_400_BAD_REQUEST)
