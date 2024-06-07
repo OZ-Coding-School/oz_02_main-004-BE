@@ -207,6 +207,9 @@ CSRF_TRUSTED_ORIGINS = [
     'https://www.oz-02-main-04.xyz/',
     'https://api.oz-02-main-04.xyz/',
     'https://oz-02-main-04.xyz/',
+    'https://api.oz-02-main-04.xyz',
+    'https://oz-02-main-04.xyz',
+    'https://www.oz-02-main-04.xyz',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
