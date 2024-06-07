@@ -95,10 +95,10 @@ class KakaoLogoutView(APIView):
     permission_classes = [IsAuthenticated]
     @swagger_auto_schema(responses={204: '로그아웃 되었습니다.'}, operation_id='카카오 로그아웃 API', operation_description='카카오 로그아웃을 진행합니다.',)
     def post(self, request):        
-        print(request)
-        print(request.headers)
         logout(request)
         response = Response({'message': '로그아웃 되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
-        response.delete_cookie('access_token', httponly=False, samesite='None', domain='.oz-02-main-04.xyz', path='/')
-        response.delete_cookie('refresh_token', httponly=False, samesite='None', domain='.oz-02-main-04.xyz', path='/')
+        domain = '.oz-02-main-04.xyz'
+        cookies_to_delete = ['access_token', 'refresh_token', 'csrftoken', 'sessionid']
+        for cookie in cookies_to_delete:
+            response.delete_cookie(cookie, domain=domain, path='/')
         return response
