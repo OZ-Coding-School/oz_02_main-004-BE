@@ -202,26 +202,11 @@ class Spotify(APIView):
         post = self.get_post(post_id=post_id)
         return post.musics.first()
 
-    @swagger_auto_schema(request_body=SpotifyQuerySerializer)
     def get(self, request, post_id):
         # get songs' list from searched results (max: 50 songs)
-        # query = request.data.get("query", None)
-        # if not query:
-        #     return Response({"error": "Query parameter is required!"})
-
-        # Parse JSON body manually
-        try:
-            data = json.loads(request.body)
-            query = data.get("query", None)
-            if not query:
-                return Response(
-                    {"error": "Query parameter is required!"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-        except json.JSONDecodeError:
-            return Response(
-                {"error": "Invalid JSON body"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        query = request.data.get("query", None)
+        if not query:
+            return Response({"error": "Query parameter is required!"})
 
         try:
             post = self.get_post(post_id)
