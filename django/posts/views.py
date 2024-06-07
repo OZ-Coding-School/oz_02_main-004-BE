@@ -19,6 +19,7 @@ from posts.serializer import (
     ToDoSerializer,
     ToDoCreateSerializer,
 )
+from drf_yasg.utils import swagger_auto_schema
 
 # spotify
 # reference : https://spotipy.readthedocs.io/en/2.24.0/#examples
@@ -64,9 +65,10 @@ class PostsByUser(APIView):
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=PostCreateSerializer)
     def post(self, request, user_id):
         user = self.get_user(user_id=user_id)
-        serializer = PostCreateSerializer(data=request.data)
+        serializer = PostCreateSerializer(data=request.data, context={'user_id': user_id})
         if serializer.is_valid():
             post = serializer.save(user=user)
             serializer = PostSerializer(post)
@@ -74,6 +76,7 @@ class PostsByUser(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # 포스트 내용 변경 : 'todo_date' is required
+    @swagger_auto_schema(request_body=PostSerializer)
     def put(self, request, user_id):
         target_date = request.data.get("todo_date")
         post = self.get_post(user_id=user_id, target_date=target_date)
@@ -110,7 +113,8 @@ class ToDoView(APIView):
 
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)
-
+    
+    @swagger_auto_schema(request_body=ToDoCreateSerializer)
     def post(self, request, post_id):
         post = self.get_post(post_id)
         # if request.user != post.user:
@@ -136,7 +140,8 @@ class ToDoEdit(APIView):
 
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)
-
+    
+    @swagger_auto_schema(request_body=ToDoSerializer)
     def put(self, request, post_id, todo_id):
         post = self.get_post(post_id)
         try:
@@ -188,7 +193,8 @@ class Spotify(APIView):
     def get_current_song(self, post_id):
         post = self.get_post(post_id=post_id)
         return post.musics.first()
-
+    
+    @swagger_auto_schema(request_body=SpotifySerializer)
     def get(self, request, post_id):
         # get songs' list from searched results (max: 50 songs)
         query = request.data.get("query", None)
@@ -223,7 +229,8 @@ class Spotify(APIView):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
+        
+    @swagger_auto_schema(request_body=SongCreateSerializer)
     def post(self, request, post_id):
         # assumption: a certain song is selected
         """
@@ -245,6 +252,7 @@ class Spotify(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # 등록된 음악을 변경할 경우
+    @swagger_auto_schema(request_body=SpotifySerializer)
     def put(self, request, post_id):
         current_song = self.get_current_song(post_id)
         if not current_song:
@@ -287,6 +295,7 @@ class TimerView(APIView):
         timer.update_duration()
         serializer = TimerSerializer(timer)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
 
     def post(self, request, post_id):
         post = self.get_post(post_id)
@@ -298,6 +307,7 @@ class TimerView(APIView):
         return Response(serializer.errors, status=status.HTTP_200_BAD_REQUEST)
 
     # timer reset/pause/restart
+    @swagger_auto_schema(request_body=TimerSerializer)
     def patch(self, request, post_id):
         action = request.data.get("action", None)
         post = self.get_post(post_id)
