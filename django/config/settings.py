@@ -214,6 +214,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://api.oz-02-main-04.xyz',
     'https://oz-02-main-04.xyz',
     'https://www.oz-02-main-04.xyz',
+    'oz-02-main-04.xyz',
 ]
 
 CSRF_COOKIE_NAME = "csrftoken"
