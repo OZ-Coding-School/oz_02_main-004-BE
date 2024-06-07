@@ -1,7 +1,7 @@
 from django.conf import settings
 from posts.models import Post, Timer, ToDo
 from users.models import User
-from users.views import IsStaffUser
+from users.userviews import IsStaffUser
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
