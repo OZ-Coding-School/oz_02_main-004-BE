@@ -191,7 +191,6 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SAMESITE = 'None'
-# CSRF_COOKIE_DOMAIN = '.oz-02-main-04.xyz'
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'https://www.oz-02-main-04.xyz/',
