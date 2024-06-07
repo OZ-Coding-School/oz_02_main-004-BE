@@ -186,8 +186,8 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SAMESITE = 'None'
@@ -195,10 +195,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'https://www.oz-02-main-04.xyz/',
     'https://api.oz-02-main-04.xyz/',
-    'https://oz-02-main-04.xyz/',
-    'https://api.oz-02-main-04.xyz',
-    'https://oz-02-main-04.xyz',
-    'https://www.oz-02-main-04.xyz',
+    'https://oz-02-main-04.xyz/',            
 ]
 CSRF_COOKIE_NAME = 'csrftoken'
 CORS_ORIGIN_ALLOW_ALL = True

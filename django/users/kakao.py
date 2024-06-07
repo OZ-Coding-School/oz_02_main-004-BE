@@ -105,5 +105,5 @@ class KakaoLogoutView(APIView):
         api_domain = 'api.oz-02-main-04.xyz'
         api_cookies_to_delete = ['csrftoken', 'sessionid']
         for cookie in api_cookies_to_delete:
-            response.delete_cookie(cookie, domain=api_domain, path='/')
+            response.delete_cookie(cookie, domain=api_domain, path='/')         
         return response
