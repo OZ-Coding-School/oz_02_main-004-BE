@@ -92,9 +92,11 @@ class KakaoCallBackView(APIView):
             return Response({'message': '카카오 계정 이메일이 없습니다.'}, status=status.HTTP_400_BAD_REQUEST,)
 
 class KakaoLogoutView(APIView):
-    permission_classes = [IsAuthenticated]
-    @swagger_auto_schema(responses={204: '로그아웃 되었습니다.'}, operation_id='카카오 로그아웃 API', operation_description='카카오 로그아웃을 진행합니다.',)
+    # permission_classes = [IsAuthenticated]
+    # @swagger_auto_schema(responses={204: '로그아웃 되었습니다.'}, operation_id='카카오 로그아웃 API', operation_description='카카오 로그아웃을 진행합니다.',)
     def post(self, request):        
+        print(request)
+        print(request.headers)
         logout(request)
         response = Response({'message': '로그아웃 되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
         response.delete_cookie('access_token')
