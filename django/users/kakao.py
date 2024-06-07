@@ -85,8 +85,8 @@ class KakaoCallBackView(APIView):
 
             # 배포 환경에서만 secure=True와 samesite='None' 설정
             secure_cookie = request.is_secure()
-            response.set_cookie('access_token', str(refresh.access_token), httponly=False, samesite='None' if secure_cookie else 'Lax', secure=secure_cookie, domain='.oz-02-main-04.xyz', path='/')
-            response.set_cookie('refresh_token', str(refresh), httponly=False, samesite='None' if secure_cookie else 'Lax', secure=secure_cookie, domain='.oz-02-main-04.xyz', path='/')
+            response.set_cookie('access_token', str(refresh.access_token), domain='.oz-02-main-04.xyz', path='/')
+            response.set_cookie('refresh_token', str(refresh), domain='.oz-02-main-04.xyz', path='/')
             return response
         else:
             return Response({'message': '카카오 계정 이메일이 없습니다.'}, status=status.HTTP_400_BAD_REQUEST,)
