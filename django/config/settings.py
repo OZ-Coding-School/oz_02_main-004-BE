@@ -212,6 +212,9 @@ CSRF_TRUSTED_ORIGINS = [
     'https://www.oz-02-main-04.xyz',
 ]
 
+CSRF_COOKIE_NAME = "csrftoken"
+
+
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = ['content-type', 'x-requested-with', 'authorization', 'accept', 'origin', 'x-csrftoken']
