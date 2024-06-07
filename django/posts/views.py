@@ -1,6 +1,7 @@
 from django.conf import settings
 from posts.models import Post, Timer, ToDo
 from users.models import User
+from users.views import IsStaffUser
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -24,16 +25,18 @@ from posts.serializer import (
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
+
 # /post/list
 class PostList(APIView):
     # todo: 관리자만 접근 가능하도록 변경할것
-    # permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsStaffUser]
 
     # 전체 post list
     def get(self, request):
         posts = Post.objects.all()
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 # /post/<int:user_id>
 class PostsByUser(APIView):
@@ -42,9 +45,6 @@ class PostsByUser(APIView):
 
     def get_user(self, user_id):
         return get_object_or_404(User, id=user_id)
-
-    def check_todo_exist(self):
-        pass
 
     # get post list written by a certain user
     def get_posts_by_user(self, user_id):
@@ -78,7 +78,9 @@ class PostsByUser(APIView):
         target_date = request.data.get("todo_date")
         post = self.get_post(user_id=user_id, target_date=target_date)
         if not post:
-            return Response({"error": "Post Not Found"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Post Not Found"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         serializer = PostSerializer(post, data=request.data, partial=True)
         if serializer.is_valid():
@@ -92,15 +94,20 @@ class PostsByUser(APIView):
         target_date = request.data.get("todo_date")
         post = self.get_post(user_id=user_id, target_date=target_date)
         if not post:
-            return Response({"error": "Post does not exist!"}, status=status.HTTP_404_NOT_FOUND,)
+            return Response(
+                {"error": "Post does not exist!"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 # /post/todo/<int:post_id>
 class ToDoView(APIView):
     # authentication_classes = [JWTAuthentication]
     # permission_classes = [IsAuthenticated]
+
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)
 
@@ -122,9 +129,11 @@ class ToDoView(APIView):
         serializer = ToDoSerializer(todos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 # /post/todo/<int:post_id>/<int:todo_id>
 class ToDoEdit(APIView):
     # permission_classes = [IsAuthenticated]
+
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)
 
@@ -133,7 +142,9 @@ class ToDoEdit(APIView):
         try:
             todo = post.items.get(id=todo_id)
         except ToDo.DoesNotExist:
-            return Response({"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND
+            )
 
         serializer = ToDoSerializer(todo, data=request.data, partial=True)
 
@@ -150,13 +161,17 @@ class ToDoEdit(APIView):
         try:
             todo = post.items.get(id=todo_id)
         except ToDo.DoesNotExist:
-            return Response({"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND
+            )
         todo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 # /music/<int:post_id>
 class Spotify(APIView):
-    # spotify api key -> .env 파일에 저장할 것
+    # permission_classes = [IsAuthenticated]
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.sp = spotipy.Spotify(
@@ -200,10 +215,14 @@ class Spotify(APIView):
                     # song = serializer.save()
                     tracks.append(serializer.data)
                 else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                    )
             return Response(tracks, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def post(self, request, post_id):
         # assumption: a certain song is selected
@@ -229,7 +248,10 @@ class Spotify(APIView):
     def put(self, request, post_id):
         current_song = self.get_current_song(post_id)
         if not current_song:
-            return Response({"error": "Any song was not registered yet."}, status=status.HTTP_404_NOT_FOUND,)
+            return Response(
+                {"error": "Any song was not registered yet."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         serializer = SpotifySerializer(current_song, data=request.data, partial=True)
         if serializer.is_valid():
             song = serializer.save()
@@ -240,17 +262,27 @@ class Spotify(APIView):
     def delete(self, request, post_id):
         current_song = self.get_current_song(post_id=post_id)
         if not current_song:
-            return Response({"error": "No song exists"}, status=status.HTTP_404_NOT_FOUND,)
+            return Response(
+                {"error": "No song exists"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         current_song.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 # /timer/<int:post_id>
 class TimerView(APIView):
+    # permission_classes = [IsAuthenticated]
+
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)
 
     def get(self, request, post_id):
         post = self.get_post(post_id)
+        # 해당 post_id 로 생성된 timer가 없을 경우
+        if not hasattr(post, "timer"):
+            raise NotFound(detail="Timer not found for this post.")
+
         timer = post.timer
         timer.update_duration()
         serializer = TimerSerializer(timer)
@@ -277,7 +309,9 @@ class TimerView(APIView):
         elif action == "reset":
             timer.reset()
         else:
-            return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST
+            )
         return Response(TimerSerializer(timer).data, status=status.HTTP_200_OK)
 
     def delete(self, request, post_id):
