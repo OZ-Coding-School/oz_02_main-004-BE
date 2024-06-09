@@ -101,4 +101,6 @@ class KakaoLogoutView(APIView):
         response = Response({'message': '로그아웃 되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
         response.delete_cookie('access_token', httponly=False, samesite='None', domain='.oz-02-main-04.xyz', path='/')
         response.delete_cookie('refresh_token', httponly=False, samesite='None', domain='.oz-02-main-04.xyz', path='/')
+        response.delete_cookie('csrftoken', httponly=False, samesite='None', domain='.oz-02-main-04.xyz', path='/')
+        response.delete_cookie('sessionid', httponly=False, samesite='None', domain='.oz-02-main-04.xyz', path='/')
         return response

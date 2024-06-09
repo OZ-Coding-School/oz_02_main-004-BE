@@ -4,6 +4,15 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
+
+class PetRating(CommonModel):
+    level = models.IntegerField(verbose_name='레벨', default=1)
+    point = models.IntegerField(verbose_name='포인트', default=0)
+
+    def __str__(self):
+        return f'{self.pet.name} - {self.rating_type}'
+
 class Pet(CommonModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='pet', verbose_name='사용자 ID')
     point = models.IntegerField(verbose_name='경험치', default=0)
@@ -11,18 +20,10 @@ class Pet(CommonModel):
     hunger_degree = models.IntegerField(default=0, verbose_name='배고픔 정도')
     type = models.CharField(max_length=50, verbose_name='캐릭터 종류')
     random_boxes = models.IntegerField(verbose_name='랜덤 박스 갯수', default=0)
-
+    petrating = models.ForeignKey(PetRating, on_delete=models.CASCADE, related_name='ratings', verbose_name='레이팅 ID')
     def __str__(self):
         return self.name
 
-class PetRating(CommonModel):
-    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='ratings', verbose_name='펫 ID')
-    rating_type = models.CharField(max_length=50, verbose_name='평가 종류')  # 예: '레벨', '배고픔'
-    level = models.IntegerField(verbose_name='레벨', default=1)
-    point = models.PositiveIntegerField(verbose_name='포인트', default=0)
-
-    def __str__(self):
-        return f'{self.pet.name} - {self.rating_type}'
 
 class Snack(CommonModel):
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='snacks', verbose_name='펫 ID')
