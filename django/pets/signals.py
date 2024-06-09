@@ -22,3 +22,4 @@ def create_initial_pet_ratings(sender, **kwargs):
             ]
             for data in initial_data:
                 PetRating.objects.create(**data)
+

@@ -1,8 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
-import json
-import platform
-import os
+import json, platform, os
 
 #cicd 머지 test
 
@@ -29,11 +27,9 @@ SECRET_KEY = 'django-insecure-wy(7)!%^)5tv3%42m*a%3430g#(9k$l#cr%yk1b^z83cuonfqk
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = ['*']
 
 # Application definition
-
 SYSTEM_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -100,7 +96,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-
 if platform_index == 'Linux':
     DATABASES = {
         'default': {
@@ -134,19 +129,14 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'ko-kr'
-
 TIME_ZONE = 'Asia/Seoul'
-
 USE_I18N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
-
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
@@ -171,24 +161,24 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     # 리프레시 토큰을 갱신할 때마다 새 토큰을 생성하지 않도록 설정합니다.
-    "ROTATE_REFRESH_TOKENS": False,
+    'ROTATE_REFRESH_TOKENS': False,
     # 토큰을 갱신한 후 이전 토큰을 블랙리스트에 추가합니다.
-    "BLACKLIST_AFTER_ROTATION": True,
+    'BLACKLIST_AFTER_ROTATION': True,
     # JWT에 사용할 서명 알고리즘으로 HS256을 사용합니다.
-    "ALGORITHM": "HS256",
+    'ALGORITHM': 'HS256',
     # JWT를 서명하는 데 사용할 키로 Django의 SECRET_KEY를 사용합니다.
-    "SIGNING_KEY": SECRET_KEY,
+    'SIGNING_KEY': SECRET_KEY,
     # JWT 검증에 사용할 키입니다. HS256 알고리즘에서는 None으로 설정됩니다.
-    "VERIFYING_KEY": None,
+    'VERIFYING_KEY': None,
     # 인증 헤더의 타입으로 'Bearer'를 사용합니다.
     # Authorization: Bearer <token>
-    "AUTH_HEADER_TYPES": ("Bearer",),
+    'AUTH_HEADER_TYPES': ('Bearer',),
     # 토큰에 포함될 사용자 식별자 필드로 'id'를 사용합니다.
-    "USER_ID_FIELD": "id",
+    'USER_ID_FIELD': 'id',
     # 토큰 클레임에서 사용자 식별자에 해당하는 키로 'user_id'를 사용합니다.
-    "USER_ID_CLAIM": "user_id",
+    'USER_ID_CLAIM': 'user_id',
     # 사용할 토큰 클래스로 AccessToken을 사용합니다.
-    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -196,29 +186,18 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-
-
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_DOMAIN = ".oz-02-main-04.xyz"
-
-
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'https://www.oz-02-main-04.xyz/',
     'https://api.oz-02-main-04.xyz/',
-    'https://oz-02-main-04.xyz/',
-    'https://api.oz-02-main-04.xyz',
-    'https://oz-02-main-04.xyz',
-    'https://www.oz-02-main-04.xyz',
+    'https://oz-02-main-04.xyz/',            
 ]
-
-CSRF_COOKIE_NAME = "csrftoken"
-
-
+CSRF_COOKIE_NAME = 'csrftoken'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = ['content-type', 'x-requested-with', 'authorization', 'accept', 'origin', 'x-csrftoken']
