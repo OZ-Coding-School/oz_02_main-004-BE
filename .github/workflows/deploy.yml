@@ -23,8 +23,8 @@ jobs:
         script: |
             cd ~/oz_02_main-004-BE/django
             # 모든 앱의 migrations 폴더 내의 __init__.py 파일을 제외한 모든 파일 삭제
-            find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
-            find . -path "*/migrations/*.pyc" -delete
+            sudo find . -path "*/migrations/*.py" -not -name "__init__.py" -exec rm {} \;
+            sudo find . -path "*/migrations/*.pyc" -exec rm {} \;
 
             cd ~/oz_02_main-004-BE
             git stash
@@ -34,3 +34,4 @@ jobs:
             chmod +x entrypoint.sh
             cd ~/oz_02_main-004-BE
             sudo docker-compose -f docker-compose.yml up --build -d
+
