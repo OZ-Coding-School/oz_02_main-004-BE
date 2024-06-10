@@ -4,9 +4,9 @@ from posts.models import Post, Music, Timer
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     # # display fields
-    # list_display = ["question_id", "question_content", "is_active"]
+    # list_display = ['question_id', 'question_content', 'is_active']
     # # created_at descending order
-    # ordering = ("question_id",)
+    # ordering = ('question_id',)
     pass
 
 @admin.register(Timer)
