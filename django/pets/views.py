@@ -8,8 +8,13 @@ from .serializers import *
 # Create your views here.
 User = get_user_model()
 
-class PetListView(APIView):
+class MyPetView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self):
-        return Response(self.request)
+    def get(self, request):
+        try:
+            pet = Pet.objects.get(user=request.user)
+            serializer = PetSerializer(pet)
+            return Response(serializer.data)
+        except Pet.DoesNotExist:
+            return Response({"error": "Pet not found"}, status=404)
