@@ -21,6 +21,11 @@ jobs:
         key: ${{ secrets.SERVER_SSH_KEY }}
         port: ${{ secrets.AWS_SSH_PORT }}
         script: |
+            cd ~/oz_02_main-004-BE/django
+            # 모든 앱의 migrations 폴더 내의 __init__.py 파일을 제외한 모든 파일 삭제
+            find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+            find . -path "*/migrations/*.pyc" -delete
+
             cd ~/oz_02_main-004-BE
             git stash
             git switch develop
