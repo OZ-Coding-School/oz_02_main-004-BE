@@ -202,9 +202,10 @@ class Spotify(APIView):
         post = self.get_post(post_id=post_id)
         return post.musics.first()
 
+    @swagger_auto_schema(query_serializer=SpotifyQuerySerializer)
     def get(self, request, post_id):
         # get songs' list from searched results (max: 50 songs)
-        query = request.data.get("query", None)
+        query = request.query_params.get("query", None)
         if not query:
             return Response({"error": "Query parameter is required!"})
 
