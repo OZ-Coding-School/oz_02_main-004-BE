@@ -85,8 +85,8 @@ class KakaoCallBackView(APIView):
 
             # 배포 환경에서만 secure=True와 samesite='None' 설정
             secure_cookie = request.is_secure()
-            response.set_cookie('access_token', str(refresh.access_token), httponly=False, samesite='None' if secure_cookie else 'Lax', secure=secure_cookie, domain='.oz-02-main-04.xyz', path='/')
-            response.set_cookie('refresh_token', str(refresh), httponly=False, samesite='None' if secure_cookie else 'Lax', secure=secure_cookie, domain='.oz-02-main-04.xyz', path='/')
+            response.set_cookie('access_token', str(refresh.access_token), domain='.oz-02-main-04.xyz', path='/')
+            response.set_cookie('refresh_token', str(refresh), domain='.oz-02-main-04.xyz', path='/')
             return response
         else:
             return Response({'message': '카카오 계정 이메일이 없습니다.'}, status=status.HTTP_400_BAD_REQUEST,)
@@ -95,10 +95,16 @@ class KakaoLogoutView(APIView):
     permission_classes = [IsAuthenticated]
     @swagger_auto_schema(responses={204: '로그아웃 되었습니다.'}, operation_id='카카오 로그아웃 API', operation_description='카카오 로그아웃을 진행합니다.',)
     def post(self, request):        
-        print(request)
-        print(request.headers)
         logout(request)
         response = Response({'message': '로그아웃 되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
-        response.delete_cookie('access_token', httponly=False, samesite='None', domain='.oz-02-main-04.xyz', path='/')
-        response.delete_cookie('refresh_token', httponly=False, samesite='None', domain='.oz-02-main-04.xyz', path='/')
+        domain = '.oz-02-main-04.xyz'
+        cookies_to_delete = ['access_token', 'refresh_token']
+        for cookie in cookies_to_delete:
+            response.delete_cookie(cookie, domain=domain, path='/')
+
+        api_domain = 'api.oz-02-main-04.xyz'
+        api_cookies_to_delete = ['csrftoken', 'sessionid']
+        for cookie in api_cookies_to_delete:
+            response.delete_cookie(cookie, domain=api_domain, path='/')         
+
         return response
