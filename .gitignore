@@ -5,7 +5,13 @@
 __pycache__
 media
 db.sqlite3
-migrations/
+# Ignore all files in migrations directories
+**/migrations/*
+
+# But don't ignore the __init__.py file
+!**/migrations/__init__.py
+
+
 
 # Backup files # 
 *.bak 
