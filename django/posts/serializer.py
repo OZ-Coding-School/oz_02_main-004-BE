@@ -4,6 +4,10 @@ from users.serializers import UserSerializer
 from django.utils import timezone
 
 
+class ConsecutiveDaysSerializer(serializers.Serializer):
+    streak = serializers.IntegerField()
+
+
 class ToDoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ToDo

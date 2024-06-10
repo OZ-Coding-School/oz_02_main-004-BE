@@ -23,6 +23,7 @@ from posts.serializer import (
     ToDoSerializer,
     ToDoEditSerializer,
     ToDoCreateSerializer,
+    ConsecutiveDaysSerializer,
 )
 from drf_yasg.utils import swagger_auto_schema
 
@@ -31,8 +32,26 @@ from drf_yasg.utils import swagger_auto_schema
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
+# get consecutive days when todo_progress > = 80
+from posts.utils import get_consecutive_success_days
 
-# /post/list
+
+# /api/v1/posts/calendar/<int:user_id>
+class CalendarView(APIView):
+    def get_user(self, user_id):
+        return get_object_or_404(User, id=user_id)
+
+    def get(self, request, user_id):
+        user = self.get_user(user_id)
+        streak = get_consecutive_success_days(user)
+        serializer = ConsecutiveDaysSerializer(data={"streak": streak})
+
+        if serializer.is_valid():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# /api/v1/posts/list
 class PostList(APIView):
     # todo: 관리자만 접근 가능하도록 변경할것
     # permission_classes = [IsAuthenticated, IsStaffUser]
@@ -44,7 +63,7 @@ class PostList(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# /post/<int:user_id>
+# /api/v1/posts/<int:user_id>
 class PostsByUser(APIView):
     # todo: 로그인한 해당 유저만 접근가능
     # permission_classes = [IsAuthenticated]
@@ -114,7 +133,7 @@ class PostsByUser(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# /post/todo/<int:post_id>
+# /api/v1/posts/todo/<int:post_id>
 class ToDoView(APIView):
     # authentication_classes = [JWTAuthentication]
     # permission_classes = [IsAuthenticated]
@@ -132,6 +151,9 @@ class ToDoView(APIView):
         if serializer.is_valid():
             todo = serializer.save(post=post)
             serializer = ToDoSerializer(todo)
+            # update todo_progress after editing todo_item
+            post.update_progress()
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_200_BAD_REQUEST)
 
@@ -142,7 +164,7 @@ class ToDoView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# /post/todo/<int:post_id>/<int:todo_id>
+# /api/v1/posts/todo/<int:post_id>/<int:todo_id>
 class ToDoEdit(APIView):
     # permission_classes = [IsAuthenticated]
 
@@ -181,7 +203,7 @@ class ToDoEdit(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# /music/<int:post_id>
+# /api/v1/posts/music/<int:post_id>
 class Spotify(APIView):
     # permission_classes = [IsAuthenticated]
 
@@ -286,7 +308,7 @@ class Spotify(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# /timer/<int:post_id>
+# /api/v1/posts/timer/<int:post_id>
 class TimerView(APIView):
     # permission_classes = [IsAuthenticated]
 

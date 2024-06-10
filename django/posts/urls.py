@@ -10,4 +10,9 @@ urlpatterns = [
     ),
     path("music/<int:post_id>", views.Spotify.as_view(), name="spotify-api"),
     path("timer/<int:post_id>", views.TimerView.as_view(), name="timer-api"),
+    path(
+        "calendar/<int:user_id>",
+        views.CalendarView.as_view(),
+        name="consecutive-success-days",
+    ),
 ]
