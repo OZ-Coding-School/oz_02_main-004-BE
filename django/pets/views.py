@@ -17,4 +17,4 @@ class MyPetView(APIView):
             serializer = PetSerializer(pet)
             return Response(serializer.data)
         except Pet.DoesNotExist:
-            return Response({"error": "Pet not found"}, status=404)
+            return Response({'error': 'Pet not found'}, status=404)
