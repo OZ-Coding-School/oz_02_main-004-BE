@@ -44,6 +44,7 @@ CUSTOM_APPS = [
     'users.apps.UsersConfig',
     'posts.apps.PostsConfig',
     'pets.apps.PetsConfig',
+    'guestbook.apps.GuestbookConfig',
 ]
 
 THIRD_PARTY_APPS = [

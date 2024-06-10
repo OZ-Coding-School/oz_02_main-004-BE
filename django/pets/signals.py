@@ -2,8 +2,11 @@ from django.db.models.signals import post_save, post_migrate
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from pets.models import Pet, PetRating, Background, PetCollection
+from guestbook.models import GuestBook
+
 
 User = get_user_model()
+
 
 @receiver(post_save, sender=User)
 def create_pet_for_new_user(sender, instance, created, **kwargs):
@@ -18,6 +21,9 @@ def create_pet_for_new_user(sender, instance, created, **kwargs):
             primary_background=default_background,
             primary_pet=default_pet_collection
         )
+
+        GuestBook.objects.create(user=instance)
+
 
 @receiver(post_migrate)
 def create_initial_pet_ratings(sender, **kwargs):
