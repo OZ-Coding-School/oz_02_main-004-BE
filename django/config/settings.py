@@ -31,7 +31,6 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 
-
 # Application definition
 SYSTEM_APPS = [
     "django.contrib.admin",
@@ -158,8 +157,8 @@ STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -183,24 +182,24 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     # 리프레시 토큰을 갱신할 때마다 새 토큰을 생성하지 않도록 설정합니다.
-    'ROTATE_REFRESH_TOKENS': False,
+    "ROTATE_REFRESH_TOKENS": False,
     # 토큰을 갱신한 후 이전 토큰을 블랙리스트에 추가합니다.
-    'BLACKLIST_AFTER_ROTATION': True,
+    "BLACKLIST_AFTER_ROTATION": True,
     # JWT에 사용할 서명 알고리즘으로 HS256을 사용합니다.
-    'ALGORITHM': 'HS256',
+    "ALGORITHM": "HS256",
     # JWT를 서명하는 데 사용할 키로 Django의 SECRET_KEY를 사용합니다.
-    'SIGNING_KEY': SECRET_KEY,
+    "SIGNING_KEY": SECRET_KEY,
     # JWT 검증에 사용할 키입니다. HS256 알고리즘에서는 None으로 설정됩니다.
-    'VERIFYING_KEY': None,
+    "VERIFYING_KEY": None,
     # 인증 헤더의 타입으로 'Bearer'를 사용합니다.
     # Authorization: Bearer <token>
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    "AUTH_HEADER_TYPES": ("Bearer",),
     # 토큰에 포함될 사용자 식별자 필드로 'id'를 사용합니다.
-    'USER_ID_FIELD': 'id',
+    "USER_ID_FIELD": "id",
     # 토큰 클레임에서 사용자 식별자에 해당하는 키로 'user_id'를 사용합니다.
-    'USER_ID_CLAIM': 'user_id',
+    "USER_ID_CLAIM": "user_id",
     # 사용할 토큰 클래스로 AccessToken을 사용합니다.
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -212,15 +211,15 @@ AUTHENTICATION_BACKENDS = [
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False
-CSRF_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8000',
-    'https://www.oz-02-main-04.xyz/',
-    'https://api.oz-02-main-04.xyz/',
-    'https://oz-02-main-04.xyz/',            
+    "http://localhost:8000",
+    "https://www.oz-02-main-04.xyz/",
+    "https://api.oz-02-main-04.xyz/",
+    "https://oz-02-main-04.xyz/",
 ]
-CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_COOKIE_NAME = "csrftoken"
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
@@ -231,7 +230,7 @@ CORS_ALLOW_HEADERS = [
     "origin",
     "x-csrftoken",
 ]
-CORS_ALLOW_METHODS = ["GET", "POST"]
+CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 SOCIALACCOUNT_LOGIN_ON_GET = True
