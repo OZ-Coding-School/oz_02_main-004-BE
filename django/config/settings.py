@@ -130,7 +130,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-
 LANGUAGE_CODE = 'ko-kr'
 TIME_ZONE = 'Asia/Seoul'
 USE_I18N = True
@@ -186,25 +185,21 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
-]
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend', 'allauth.account.auth_backends.AuthenticationBackend',]
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False
-CSRF_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SAMESITE = 'None'
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8000',
-    'https://www.oz-02-main-04.xyz/',
-    'https://api.oz-02-main-04.xyz/',
-    'https://oz-02-main-04.xyz/',
-]
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://localhost:8000', 'https://www.oz-02-main-04.xyz/', 'https://api.oz-02-main-04.xyz/', 'https://oz-02-main-04.xyz/',]
 CSRF_COOKIE_NAME = 'csrftoken'
-CORS_ORIGIN_ALLOW_ALL = True
+
+if platform_index == 'Linux':
+    CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = ['http://localhost:3000', 'http://localhost:8000', 'https://www.oz-02-main-04.xyz', 'https://api.oz-02-main-04.xyz', 'https://oz-02-main-04.xyz',]
 CORS_ALLOW_HEADERS = ['content-type', 'x-requested-with', 'authorization', 'accept', 'origin', 'x-csrftoken',]
 CORS_ALLOW_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

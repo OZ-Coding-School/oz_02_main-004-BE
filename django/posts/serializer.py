@@ -1,7 +1,17 @@
 from rest_framework import serializers
-from posts.models import Post, Timer, Music, ToDo
+from posts.models import Post, Timer, Music, ToDo, UserGoal
 from users.serializers import UserSerializer
 from django.utils import timezone
+
+class UserGoalCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserGoal
+        fields = ('goal', 'd_day')
+
+class UserGoalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserGoal
+        fields = '__all__'
 
 class ConsecutiveDaysSerializer(serializers.Serializer):
     streak = serializers.IntegerField()
@@ -40,7 +50,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
         if value < timezone.now().date():
             raise serializers.ValidationError('todo date cannot be in the past.')
 
-        user = self.context.get('user_id')
+        user = self.context.get("user_id")
         print(user)
         # user = self.context['request'].user
         if Post.objects.filter(todo_date=value, user=user).exists():

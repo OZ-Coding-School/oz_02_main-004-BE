@@ -9,4 +9,4 @@ class UserToDoInteraction(CommonModel):
     interaction_type = models.CharField(max_length=50)  # completed,
 
     def __str__(self):
-        return f"{self.user.username} / {self.todo.todo_item} / {self.interaction_type}"
+        return f'{self.user.username} / {self.todo.todo_item} / {self.interaction_type}'
