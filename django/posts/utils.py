@@ -1,6 +1,4 @@
-from django.utils import timezone
 from datetime import timedelta
-
 
 def get_consecutive_success_days(user) -> int:
     posts = user.posts.filter(todo_progress__gte=80).order_by("-todo_date")

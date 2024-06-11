@@ -3,7 +3,6 @@ from common.models import CommonModel
 from users.models import User
 from posts.models import ToDo
 
-
 class UserToDoInteraction(CommonModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     todo = models.ForeignKey(ToDo, on_delete=models.CASCADE)

@@ -32,10 +32,8 @@ from drf_yasg.utils import swagger_auto_schema
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-
 # get consecutive days when todo_progress > = 80
 from posts.utils import get_consecutive_success_days
-
 
 # /api/v1/posts/calendar/<int:user_id>
 class CalendarView(APIView):
@@ -51,7 +49,6 @@ class CalendarView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 # /api/v1/posts/list
 class PostList(APIView):
     # todo: 관리자만 접근 가능하도록 변경할것
@@ -62,7 +59,6 @@ class PostList(APIView):
         posts = Post.objects.all()
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 # /api/v1/posts/<int:user_id>
 class PostsByUser(APIView):
@@ -94,9 +90,7 @@ class PostsByUser(APIView):
     @swagger_auto_schema(request_body=PostCreateSerializer)
     def post(self, request, user_id):
         user = self.get_user(user_id=user_id)
-        serializer = PostCreateSerializer(
-            data=request.data, context={"user_id": user_id}
-        )
+        serializer = PostCreateSerializer(data=request.data, context={"user_id": user_id})
         if serializer.is_valid():
             post = serializer.save(user=user)
             serializer = PostSerializer(post)
@@ -109,9 +103,7 @@ class PostsByUser(APIView):
         target_date = request.data.get("todo_date")
         post = self.get_post(user_id=user_id, target_date=target_date)
         if not post:
-            return Response(
-                {"error": "Post Not Found"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Post Not Found"}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = PostSerializer(post, data=request.data, partial=True)
         if serializer.is_valid():
@@ -126,14 +118,10 @@ class PostsByUser(APIView):
         target_date = request.data.get("todo_date")
         post = self.get_post(user_id=user_id, target_date=target_date)
         if not post:
-            return Response(
-                {"error": "Post does not exist!"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            return Response({"error": "Post does not exist!"}, status=status.HTTP_404_NOT_FOUND,)
 
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 # /api/v1/posts/todo/<int:post_id>
 class ToDoView(APIView):
@@ -165,7 +153,6 @@ class ToDoView(APIView):
         serializer = ToDoSerializer(todos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
 # /api/v1/posts/todo/<int:post_id>/<int:todo_id>
 class ToDoEdit(APIView):
     # permission_classes = [IsAuthenticated]
@@ -179,9 +166,7 @@ class ToDoEdit(APIView):
         try:
             todo = post.items.get(id=todo_id)
         except ToDo.DoesNotExist:
-            return Response(
-                {"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = ToDoSerializer(todo, data=request.data, partial=True)
 
@@ -198,12 +183,9 @@ class ToDoEdit(APIView):
         try:
             todo = post.items.get(id=todo_id)
         except ToDo.DoesNotExist:
-            return Response(
-                {"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "Todo item not found."}, status=status.HTTP_404_NOT_FOUND)
         todo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 # /api/v1/posts/music/<int:post_id>
 class Spotify(APIView):
@@ -252,14 +234,10 @@ class Spotify(APIView):
                     # song = serializer.save()
                     tracks.append(serializer.data)
                 else:
-                    return Response(
-                        serializer.errors, status=status.HTTP_400_BAD_REQUEST
-                    )
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response(tracks, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response(
-                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @swagger_auto_schema(request_body=SongCreateSerializer)
     def post(self, request, post_id):
@@ -287,10 +265,7 @@ class Spotify(APIView):
     def put(self, request, post_id):
         current_song = self.get_current_song(post_id)
         if not current_song:
-            return Response(
-                {"error": "Any song was not registered yet."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            return Response({"error": "Any song was not registered yet."}, status=status.HTTP_404_NOT_FOUND,)
         serializer = SpotifySerializer(current_song, data=request.data, partial=True)
         if serializer.is_valid():
             song = serializer.save()
@@ -301,13 +276,9 @@ class Spotify(APIView):
     def delete(self, request, post_id):
         current_song = self.get_current_song(post_id=post_id)
         if not current_song:
-            return Response(
-                {"error": "No song exists"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            return Response({"error": "No song exists"}, status=status.HTTP_404_NOT_FOUND,)
         current_song.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 # /api/v1/posts/timer/<int:post_id>
 class TimerView(APIView):
@@ -349,9 +320,7 @@ class TimerView(APIView):
         elif action == "reset":
             timer.reset()
         else:
-            return Response(
-                {"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(TimerSerializer(timer).data, status=status.HTTP_200_OK)
 
     def delete(self, request, post_id):

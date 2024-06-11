@@ -31,7 +31,6 @@ def create_initial_pet_ratings(sender, **kwargs):
             for data in initial_data:
                 PetRating.objects.create(**data)
 
-
 # Signals to set default values for Pet model
 @receiver(post_save, sender=Pet)
 def set_default_pet_items(sender, instance, created, **kwargs):
