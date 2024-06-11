@@ -1,6 +1,6 @@
 import json
 from django.conf import settings
-from posts.models import Post, ToDo
+from posts.models import Post, ToDo, UserGoal
 from users.models import User
 from users.userviews import IsStaffUser
 from django.shortcuts import get_object_or_404
@@ -24,6 +24,8 @@ from posts.serializer import (
     ToDoEditSerializer,
     ToDoCreateSerializer,
     ConsecutiveDaysSerializer,
+    UserGoalCreateSerializer,
+    UserGoalSerializer,
 )
 from drf_yasg.utils import swagger_auto_schema
 
@@ -34,6 +36,35 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 # get consecutive days when todo_progress > = 80
 from posts.utils import get_consecutive_success_days
+
+
+# /api/v1/posts/goal/<int:user_id>
+class UserGoalView(APIView):
+    def get_user(self, user_id):
+        return get_object_or_404(User, id=user_id)
+
+    def get(self, request, user_id):
+        user = self.get_user(user_id)
+        goal = user.goal
+        serializer = UserGoalSerializer(goal)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, user_id):
+        user = self.get_user(user_id)
+        try:
+            goal = user.goal
+        except UserGoal.DoesNotExist:
+            goal = None
+
+        serializer = UserGoalSerializer(goal, data=request.data, partial=True)
+        if serializer.is_valid():
+            if goal is None:
+                serializer.save(user=user)
+            else:
+                serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # /api/v1/posts/calendar/<int:user_id>
 class CalendarView(APIView):
