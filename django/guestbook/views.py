@@ -1,10 +1,30 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import GuestBook, GuestBookComment
-from .serializers import GuestBookSerializer, GuestBookCommentSerializer
+from .serializers import GuestBookSerializer, GuestBookCommentSerializer, GuestBookIdUserSerializer
 from django.http import Http404
+from users.models import User
+from drf_yasg.utils import swagger_auto_schema
+
+
+
+class GuestBookViewdetail(APIView):
+    permission_classes = [IsAuthenticated]
+
+
+    def get(self, request, nickname):
+        users = User.objects.filter(nickname__icontains=nickname)
+        if not users.exists():
+            return Response({"error": "No users found"}, status=404)
+
+        serializer = GuestBookIdUserSerializer(users, many=True)
+        return Response(serializer.data)
+
+
+
 
 class GuestBookView(APIView):
     permission_classes = [IsAuthenticated]
@@ -14,12 +34,6 @@ class GuestBookView(APIView):
         serializer = GuestBookSerializer(guestbooks, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = GuestBookSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class GuestBookCommentView(APIView):
     permission_classes = [IsAuthenticated]
@@ -30,13 +44,18 @@ class GuestBookCommentView(APIView):
         except GuestBookComment.DoesNotExist:
             raise Http404
 
-    def get(self, request, guestbook_id):
+    def get(self, request, user_id):
+        user = users = User.objects.get(id=user_id)
+        gb = GuestBook.objects.filter(user=user)
+
+
         comments = GuestBookComment.objects.filter(guestbook_id=guestbook_id)
         serializer = GuestBookCommentSerializer(comments, many=True)
         return Response(serializer.data)
 
-    def post(self, request, guestbook_id):
-        guestbook = GuestBook.objects.get(pk=guestbook_id)
+    @swagger_auto_schema(request_body=GuestBookCommentSerializer)
+    def post(self, request, user_id):
+        guestbook = GuestBook.objects.get(user=user_id)
         serializer = GuestBookCommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user, guestbook=guestbook)

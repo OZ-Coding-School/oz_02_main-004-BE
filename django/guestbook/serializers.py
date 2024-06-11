@@ -1,12 +1,23 @@
 from rest_framework import serializers
-from .models import GuestBook, GuestBookComment
+from guestbook.models import GuestBook, GuestBookComment
+from users.models import User
 
-class GuestBookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = GuestBook
-        fields = '__all__'
 
 class GuestBookCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = GuestBookComment
-        fields = '__all__'
+        fields = ['user', 'content', 'created_at']
+
+class GuestBookSerializer(serializers.ModelSerializer):
+    comments = GuestBookCommentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = GuestBook
+        fields = ['user', 'comments']
+
+
+class GuestBookIdUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'nickname']
+
