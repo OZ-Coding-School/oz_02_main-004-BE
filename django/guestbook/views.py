@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import GuestBook, GuestBookComment
-from .serializers import GuestBookSerializer, GuestBookCommentSerializer, GuestBookIdUserSerializer
+from .serializers import GuestBookCommentSerializer, GuestBookIdUserSerializer
 from django.http import Http404
 from users.models import User
 from drf_yasg.utils import swagger_auto_schema
@@ -12,9 +12,9 @@ from drf_yasg.utils import swagger_auto_schema
 
 
 class GuestBookViewdetail(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
-
+    # api/v1/guestbook/<str:nickname>/
     def get(self, request, nickname):
         users = User.objects.filter(nickname__icontains=nickname)
         if not users.exists():
@@ -27,16 +27,22 @@ class GuestBookViewdetail(APIView):
 
 
 class GuestBookView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        guestbooks = GuestBook.objects.filter(user=request.user)
-        serializer = GuestBookSerializer(guestbooks, many=True)
+    # api/v1/guestbook/
+    # def get(self, request):
+    #     user = User.objects.get(email=request.user)
+    def get(self, request, nickname):
+        user = User.objects.get(nickname=nickname)
+        gb = GuestBook.objects.get(user=user)
+
+        comments = GuestBookComment.objects.filter(guestbook_id=gb.id)
+        serializer = GuestBookCommentSerializer(comments, many=True)
         return Response(serializer.data)
 
 
 class GuestBookCommentView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         try:
@@ -45,11 +51,10 @@ class GuestBookCommentView(APIView):
             raise Http404
 
     def get(self, request, user_id):
-        user = users = User.objects.get(id=user_id)
-        gb = GuestBook.objects.filter(user=user)
+        user = User.objects.get(id=user_id)
+        gb = GuestBook.objects.get(user=user)
 
-
-        comments = GuestBookComment.objects.filter(guestbook_id=guestbook_id)
+        comments = GuestBookComment.objects.filter(guestbook_id=gb.id)
         serializer = GuestBookCommentSerializer(comments, many=True)
         return Response(serializer.data)
 

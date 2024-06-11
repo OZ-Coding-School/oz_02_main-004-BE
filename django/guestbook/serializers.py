@@ -8,14 +8,6 @@ class GuestBookCommentSerializer(serializers.ModelSerializer):
         model = GuestBookComment
         fields = ['user', 'content', 'created_at']
 
-class GuestBookSerializer(serializers.ModelSerializer):
-    comments = GuestBookCommentSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = GuestBook
-        fields = ['user', 'comments']
-
-
 class GuestBookIdUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
