@@ -59,12 +59,12 @@ class Post(CommonModel):
     @property
     def days_by_deadline(self):
         if self.d_day:
-            return (self.d_day - timezone.now().date()).days
+            return (self.d_day - self.todo_date).days
         return None
 
     def is_overdue(self):
         if self.d_day:
-            return timezone.now().date() > self.d_day
+            return self.todo_date > self.d_day
         return False
 
 
