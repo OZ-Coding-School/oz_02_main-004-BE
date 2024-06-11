@@ -49,6 +49,7 @@ class UserGoalView(APIView):
         serializer = UserGoalSerializer(goal)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=UserGoalSerializer)
     def post(self, request, user_id):
         user = self.get_user(user_id)
         try:
