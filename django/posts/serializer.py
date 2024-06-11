@@ -3,7 +3,6 @@ from posts.models import Post, Timer, Music, ToDo
 from users.serializers import UserSerializer
 from django.utils import timezone
 
-
 class ConsecutiveDaysSerializer(serializers.Serializer):
     streak = serializers.IntegerField()
 
