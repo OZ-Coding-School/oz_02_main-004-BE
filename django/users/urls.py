@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from .userviews import UserListView, UserDetailView, MyInfoView
 from .kakao import KakaoView, KakaoCallBackView, KakaoLogoutView
 

@@ -2,7 +2,7 @@ from pathlib import Path
 from datetime import timedelta
 import json, platform, os
 
-#cicd 머지 test
+# cicd 머지 test
 
 # 개발환경과 서버환경 구분을 위한 변수
 platform_index = platform.system()
@@ -27,7 +27,9 @@ SECRET_KEY = 'django-insecure-wy(7)!%^)5tv3%42m*a%3430g#(9k$l#cr%yk1b^z83cuonfqk
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
 ALLOWED_HOSTS = ['*']
+
 
 # Application definition
 SYSTEM_APPS = [
@@ -44,6 +46,7 @@ CUSTOM_APPS = [
     'users.apps.UsersConfig',
     'posts.apps.PostsConfig',
     'pets.apps.PetsConfig',
+    'recommendation.apps.RecommendationConfig',
 ]
 
 THIRD_PARTY_APPS = [
@@ -96,6 +99,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+
 if platform_index == 'Linux':
     DATABASES = {
         'default': {
@@ -128,6 +132,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
+
 LANGUAGE_CODE = 'ko-kr'
 TIME_ZONE = 'Asia/Seoul'
 USE_I18N = True
@@ -136,11 +141,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
-import os
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -191,6 +194,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False
@@ -200,13 +204,20 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'https://www.oz-02-main-04.xyz/',
     'https://api.oz-02-main-04.xyz/',
-    'https://oz-02-main-04.xyz/',            
+    'https://oz-02-main-04.xyz/',
 ]
 CSRF_COOKIE_NAME = 'csrftoken'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = ['content-type', 'x-requested-with', 'authorization', 'accept', 'origin', 'x-csrftoken']
-CORS_ALLOW_METHODS = ['GET', 'POST']
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'x-requested-with',
+    'authorization',
+    'accept',
+    'origin',
+    'x-csrftoken',
+]
+CORS_ALLOW_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SOCIALACCOUNT_LOGIN_ON_GET = True

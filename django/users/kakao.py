@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import CreateUserSerializer
 from drf_yasg.utils import swagger_auto_schema
-from users.utils  import generate_random_nickname
+from users.utils import generate_random_nickname
 import requests
 
 # Create your views here.
@@ -76,12 +76,8 @@ class KakaoCallBackView(APIView):
             refresh = RefreshToken.for_user(user)
 
             # 쿠키에 토큰 저장 (세션 쿠키로 설정)
-            if not user.nickname:
-                response = HttpResponseRedirect('https://api.oz-02-main-04.xyz/api/v1/users/nickname') # 로그인 완료 시 리디렉션할 URL
-                # response = HttpResponseRedirect('http://localhost:8000/api/v1/users/nickname') # 로그인 완료 시 리디렉션할 URL
-            else:
-                response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
-                # response = HttpResponseRedirect('http://localhost:8000/api/v1/users/myinfo')
+            response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
+            # response = HttpResponseRedirect('http://localhost:8000/api/v1/users/myinfo')
 
             # 배포 환경에서만 secure=True와 samesite='None' 설정
             secure_cookie = request.is_secure()
@@ -94,7 +90,7 @@ class KakaoCallBackView(APIView):
 class KakaoLogoutView(APIView):
     permission_classes = [IsAuthenticated]
     @swagger_auto_schema(responses={204: '로그아웃 되었습니다.'}, operation_id='카카오 로그아웃 API', operation_description='카카오 로그아웃을 진행합니다.',)
-    def post(self, request):        
+    def post(self, request):
         logout(request)
         response = Response({'message': '로그아웃 되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
         domain = '.oz-02-main-04.xyz'
@@ -105,6 +101,6 @@ class KakaoLogoutView(APIView):
         api_domain = 'api.oz-02-main-04.xyz'
         api_cookies_to_delete = ['csrftoken', 'sessionid']
         for cookie in api_cookies_to_delete:
-            response.delete_cookie(cookie, domain=api_domain, path='/')         
+            response.delete_cookie(cookie, domain=api_domain, path='/')
 
         return response

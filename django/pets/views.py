@@ -1,5 +1,4 @@
-from django.contrib.auth import authenticate, get_user_model, login, logout
-from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -11,10 +10,12 @@ User = get_user_model()
 class MyPetView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
+    def get(self, request, user_id):
+        print(request.user)
         try:
-            pet = Pet.objects.get(user=request.user)
+            # pet = Pet.objects.get(user=request.user)
+            pet = Pet.objects.get(pk=user_id)
             serializer = PetSerializer(pet)
             return Response(serializer.data)
         except Pet.DoesNotExist:
-            return Response({"error": "Pet not found"}, status=404)
+            return Response({'error': 'Pet not found'}, status=404)

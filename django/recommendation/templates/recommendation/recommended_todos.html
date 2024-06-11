@@ -1,0 +1,12 @@
+<!-- todo_project/recommendations/templates/recommendations/recommended_todos.html -->
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h2>Recommended ToDo Items</h2>
+  <ul>
+    {% for item in recommended_items %}
+      <li>{{ item.title }}: {{ item.description }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
