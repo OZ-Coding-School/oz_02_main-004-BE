@@ -12,7 +12,7 @@ from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
 
-class UserGoal(models.Model):
+class UserGoal(CommonModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="goal")
     goal = models.CharField(max_length=255, blank=True, null=True)
     d_day = models.DateField(null=True, blank=True)
