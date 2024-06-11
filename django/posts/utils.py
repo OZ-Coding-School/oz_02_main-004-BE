@@ -9,7 +9,7 @@ def get_consecutive_success_days(user) -> int:
     previous_date = None
 
     for post in posts:
-        print(f'날짜 : {post.todo_date} | '달성률 : {post.todo_progress}')
+        print(f'날짜 : {post.todo_date} | 달성률 : {post.todo_progress}')
         if previous_date is None:
             streak = 1
             previous_date = post.todo_date
