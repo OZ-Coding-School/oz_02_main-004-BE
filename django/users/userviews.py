@@ -60,7 +60,7 @@ class MyInfoView(APIView):
         responses={204: '회원탈퇴가 완료되었습니다.', 400: '잘못된 요청입니다.'},
         operation_id='회원정보 수정 API',
         operation_description='회원정보 수정을 요청합니다. \n\n Post 요청을 해주세요 ',
-    )
+    )    
     def post(self, request):
         action = request.data.get('action')
         if action == 'withdraw':
