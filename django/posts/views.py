@@ -37,7 +37,6 @@ from spotipy.oauth2 import SpotifyClientCredentials
 # get consecutive days when todo_progress > = 80
 from posts.utils import get_consecutive_success_days
 
-
 # /api/v1/posts/goal/<int:user_id>
 class UserGoalView(APIView):
     def get_user(self, user_id):
@@ -65,7 +64,6 @@ class UserGoalView(APIView):
                 serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 # /api/v1/posts/calendar/<int:user_id>
 class CalendarView(APIView):

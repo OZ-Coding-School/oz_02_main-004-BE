@@ -6,11 +6,9 @@ from users.models import User
 from django.utils import timezone
 from datetime import timedelta
 
-
 # Use Django signals to automatically update future posts when the user's goal or d-day changes
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
-
 
 class UserGoal(CommonModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="goal")
@@ -30,7 +28,6 @@ class UserGoal(CommonModel):
             post.goal = self.goal
             post.d_day = self.d_day
             post.save()
-
 
 class Post(CommonModel):
     id = models.AutoField(primary_key=True)
@@ -67,7 +64,6 @@ class Post(CommonModel):
             return timezone.now().date() > self.d_day
         return False
 
-
 # new post 객체를 db에 저장하기 전에
 # usergoal table 로 부터 goal과 d-day를 상속받도록 한다
 @receiver(pre_save, sender=Post)
@@ -79,7 +75,6 @@ def set_goal_and_d_day(sender, instance, **kwargs):
         # post instance:  goal field, d-day fields update
         instance.goal = user_goal.goal if user_goal else None
         instance.d_day = user_goal.d_day if user_goal else None
-
 
 # automatically update posts(from today to the future date)
 # when user's goal or d-day changes
@@ -93,8 +88,6 @@ def update_posts_goal(sender, instance, **kwargs):
 def create_user_goal(sender, instance, created, **kwargs):
     if created:
         UserGoal.objects.create(user=instance)
-
-
 
 class ToDo(CommonModel):
     todo_item = models.CharField(max_length=255)
@@ -114,7 +107,6 @@ class Music(CommonModel):
 
     def __str__(self):
         return f'Title: {self.title}, POST: {self.post.id}'
-
 
 class Timer(CommonModel):
     on_btn = models.BooleanField(default=False)
