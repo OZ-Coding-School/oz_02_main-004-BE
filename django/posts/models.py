@@ -42,6 +42,8 @@ class Post(CommonModel):
             return timezone.now().date() > self.d_day
         return False
 
+    # todo:
+
 
 class ToDo(CommonModel):
     todo_item = models.CharField(max_length=255)
