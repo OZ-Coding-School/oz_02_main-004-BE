@@ -19,16 +19,16 @@ class UserGoal(models.Model):
     def __str__(self):
         return f"{self.user.nickname}'s goal"
 
-    def save(self, *args, **kwargs):
-        super(UserGoal, self).save(*args, **kwargs)
-
     def update_future_posts(self):
         today = timezone.now().date()
-        posts = Post.objects.filter(user=self.user, todo_date__gte=today)
-        for post in posts:
-            post.goal = self.goal
-            post.d_day = self.d_day
-            post.save()
+        post_query = Post.objects.filter(user=self.user, todo_date__gte=today)
+
+        if self.d_day:
+            post_update = post_query.filter(todo_date__lte=self.d_day)
+            post_delete = post_query.filter(todo_date__gt=self.d_day)
+
+        post_update.update(goal=self.goal, d_day=self.d_day)
+        post_delete.update(goal=None, d_day=None)
 
 
 class Post(CommonModel):
@@ -51,9 +51,10 @@ class Post(CommonModel):
         if num_items:
             num_done = self.items.filter(done=True).count()
             self.todo_progress = int((num_done / num_items) * 100)
-            self.save()
+            self.save(update_fields=["todo_progress"])
         else:
-            raise ValidationError("Cannot update progress: No ToDo items found.")
+            self.todo_progress = 0
+            self.save(update_fields=["todo_progress"])
 
     @property
     def days_by_deadline(self):
@@ -72,12 +73,12 @@ class Post(CommonModel):
 @receiver(pre_save, sender=Post)
 def set_goal_and_d_day(sender, instance, **kwargs):
     # check if the post is being created
-    if not instance.pk:
-        # user_goal: usergoal instance
-        user_goal = instance.user.goal
+    # user_goal: usergoal instance
+    user_goal = getattr(instance.user, "goal", None)
+    if user_goal:
         # post instance:  goal field, d-day fields update
-        instance.goal = user_goal.goal if user_goal else None
-        instance.d_day = user_goal.d_day if user_goal else None
+        instance.goal = user_goal.goal
+        instance.d_day = user_goal.d_day
 
 
 # automatically update posts(from today to the future date)

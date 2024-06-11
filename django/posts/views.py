@@ -24,7 +24,6 @@ from posts.serializer import (
     ToDoEditSerializer,
     ToDoCreateSerializer,
     ConsecutiveDaysSerializer,
-    UserGoalCreateSerializer,
     UserGoalSerializer,
 )
 from drf_yasg.utils import swagger_auto_schema
@@ -45,24 +44,19 @@ class UserGoalView(APIView):
 
     def get(self, request, user_id):
         user = self.get_user(user_id)
-        goal = user.goal
+        goal = getattr(user, "goal", None)
         serializer = UserGoalSerializer(goal)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, user_id):
         user = self.get_user(user_id)
-        try:
-            goal = user.goal
-        except UserGoal.DoesNotExist:
-            goal = None
-
+        goal, created = UserGoal.objects.get_or_create(user=user)
         serializer = UserGoalSerializer(goal, data=request.data, partial=True)
         if serializer.is_valid():
-            if goal is None:
-                serializer.save(user=user)
-            else:
-                serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer.save()
+            # Serialize again to include the updated goal with days_by_deadline
+            response_serializer = UserGoalSerializer(goal)
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -144,7 +138,8 @@ class PostsByUser(APIView):
         serializer = PostSerializer(post, data=request.data, partial=True)
         if serializer.is_valid():
             post = serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            post_serializer = PostSerializer(post)
+            return Response(post_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
