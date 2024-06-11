@@ -11,9 +11,11 @@ User = get_user_model()
 class MyPetView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
+    def get(self, request, user_id):
+        print(request.user)
         try:
-            pet = Pet.objects.get(user=request.user)
+            # pet = Pet.objects.get(user=request.user)
+            pet = Pet.objects.get(pk=user_id)
             serializer = PetSerializer(pet)
             return Response(serializer.data)
         except Pet.DoesNotExist:
