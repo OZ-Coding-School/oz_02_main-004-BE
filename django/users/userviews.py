@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, permissions
@@ -61,8 +60,7 @@ class MyInfoView(APIView):
         responses={204: '회원탈퇴가 완료되었습니다.', 400: '잘못된 요청입니다.'},
         operation_id='회원정보 수정 API',
         operation_description='회원정보 수정을 요청합니다. \n\n Post 요청을 해주세요 ',
-    )
-    @csrf_exempt
+    )    
     def post(self, request):
         action = request.data.get('action')
         if action == 'withdraw':
