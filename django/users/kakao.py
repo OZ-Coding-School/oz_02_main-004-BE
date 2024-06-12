@@ -79,6 +79,10 @@ class KakaoCallBackView(APIView):
             response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
             # response = HttpResponseRedirect('http://localhost:8000/api/v1/users/myinfo')
 
+            # CSRF 토큰 설정
+            csrf_token_value = get_token(request)
+            response.set_cookie('csrftoken', csrf_token_value, domain='.oz-02-main.xyz', path='/')
+
             # 배포 환경에서만 secure=True와 samesite='None' 설정
             secure_cookie = request.is_secure()
             response.set_cookie('access_token', str(refresh.access_token), domain='.oz-02-main-04.xyz', path='/')
