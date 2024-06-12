@@ -9,8 +9,6 @@ from django.http import Http404
 from users.models import User
 from drf_yasg.utils import swagger_auto_schema
 
-
-
 class GuestBookViewdetail(APIView):
     # permission_classes = [IsAuthenticated]
 
@@ -22,9 +20,6 @@ class GuestBookViewdetail(APIView):
 
         serializer = GuestBookIdUserSerializer(users, many=True)
         return Response(serializer.data)
-
-
-
 
 class GuestBookView(APIView):
     # permission_classes = [IsAuthenticated]
@@ -39,7 +34,6 @@ class GuestBookView(APIView):
         comments = GuestBookComment.objects.filter(guestbook_id=gb.id)
         serializer = GuestBookCommentSerializer(comments, many=True)
         return Response(serializer.data)
-
 
 class GuestBookCommentView(APIView):
     # permission_classes = [IsAuthenticated]
@@ -67,8 +61,6 @@ class GuestBookCommentView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
 class GuestBookCommentUpdateView(APIView):
     # permission_classes = [IsAuthenticated]
     def get_object(self, pk):
@@ -85,8 +77,6 @@ class GuestBookCommentUpdateView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 class GuestBookCommentDeleteView(APIView):
     # permission_classes = [IsAuthenticated]
