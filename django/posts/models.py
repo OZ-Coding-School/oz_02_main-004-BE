@@ -105,7 +105,7 @@ class Music(CommonModel):
     title = models.CharField(max_length=255, null=False)
     release_date = models.DateField(blank=True, null=True)
     song_url = models.CharField(max_length=255, blank=True, null=True, validators=[URLValidator()])
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='musics')
+    post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name='music')
 
     def __str__(self):
         return f'Title: {self.title}, POST: {self.post.id}'
@@ -115,7 +115,7 @@ class Timer(CommonModel):
     start = models.DateTimeField(default=timezone.now)
     end = models.DateTimeField(null=True, blank=True)
     duration = models.DurationField(default=timedelta)
-    post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name="timer", null=True, blank=True)
+    post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name='timer', null=True, blank=True)
 
     def __str__(self):
         return f'Post: {self.post}, On/off: {self.on_btn}, Duration: {self.duration}'
