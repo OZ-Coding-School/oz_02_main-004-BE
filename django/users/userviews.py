@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, permissions
@@ -48,7 +50,8 @@ class MyInfoView(APIView):
         user_data = {'id': user.id, '계정': user.email, '닉네임': user.nickname, '운영진': user.is_staff, '휴면회원': user.is_down,
                      '가입일자': user.created_at, '수정일자': user.updated_at, '로그인': user.login_method,}
         return Response(user_data)
-
+    
+    @method_decorator(csrf_exempt)
     @swagger_auto_schema(
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -60,7 +63,7 @@ class MyInfoView(APIView):
         responses={204: '회원탈퇴가 완료되었습니다.', 400: '잘못된 요청입니다.'},
         operation_id='회원정보 수정 API',
         operation_description='회원정보 수정을 요청합니다. \n\n Post 요청을 해주세요 ',
-    )
+    )    
     def post(self, request):
         action = request.data.get('action')
         if action == 'withdraw':
