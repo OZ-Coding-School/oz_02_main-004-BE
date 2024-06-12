@@ -7,15 +7,14 @@ from rest_framework import permissions
 from django.conf.urls.static import static
 from django.conf import settings
 
-
 schema_view = get_schema_view(
     openapi.Info(
-        title="Petodo API",
-        default_version="v1",
-        description="API documentation for Team4. Project",
-        terms_of_service="https://www.oz-02-main-04.xyz/",
-        contact=openapi.Contact(email="contact@example.com"),
-        license=openapi.License(name="BSD License"),
+        title='Petodo API',
+        default_version='v1',
+        description='API documentation for Team4. Project',
+        terms_of_service='https://www.oz-02-main-04.xyz/',
+        contact=openapi.Contact(email='contact@example.com'),
+        license=openapi.License(name='BSD License'),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),

@@ -15,4 +15,5 @@ urlpatterns = [
         views.CalendarView.as_view(),
         name="consecutive-success-days",
     ),
+    path("goal/<int:user_id>", views.UserGoalView.as_view(), name="set-goal"),
 ]

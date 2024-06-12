@@ -1,9 +1,7 @@
-from django.utils import timezone
 from datetime import timedelta
 
-
 def get_consecutive_success_days(user) -> int:
-    posts = user.posts.filter(todo_progress__gte=80).order_by("-todo_date")
+    posts = user.posts.filter(todo_progress__gte=80).order_by('-todo_date')
     if not posts:
         return 0
 
@@ -11,7 +9,7 @@ def get_consecutive_success_days(user) -> int:
     previous_date = None
 
     for post in posts:
-        print(f'날짜 : {post.todo_date} | "달성률 : {post.todo_progress}')
+        print(f'날짜 : {post.todo_date} | 달성률 : {post.todo_progress}')
         if previous_date is None:
             streak = 1
             previous_date = post.todo_date
@@ -23,5 +21,5 @@ def get_consecutive_success_days(user) -> int:
             else:
                 break
 
-    print(f"연속 목표 달성(days) : {streak}일")
+    print(f'연속 목표 달성(days) : {streak}일')
     return streak

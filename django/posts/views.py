@@ -1,6 +1,6 @@
 import json
 from django.conf import settings
-from posts.models import Post, ToDo
+from posts.models import Post, ToDo, UserGoal
 from users.models import User
 from users.userviews import IsStaffUser
 from django.shortcuts import get_object_or_404
@@ -16,6 +16,7 @@ from posts.serializer import (
     PostDeleteSerializer,
     SpotifySerializer,
     SongCreateSerializer,
+    SpotifyQuerySerializer,
     TimerSerializer,
     TimerCreateSerializer,
     TimerActionSerializer,
@@ -23,6 +24,7 @@ from posts.serializer import (
     ToDoEditSerializer,
     ToDoCreateSerializer,
     ConsecutiveDaysSerializer,
+    UserGoalSerializer,
 )
 from drf_yasg.utils import swagger_auto_schema
 
@@ -31,10 +33,31 @@ from drf_yasg.utils import swagger_auto_schema
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-
 # get consecutive days when todo_progress > = 80
 from posts.utils import get_consecutive_success_days
 
+# /api/v1/posts/goal/<int:user_id>
+class UserGoalView(APIView):
+    def get_user(self, user_id):
+        return get_object_or_404(User, id=user_id)
+
+    def get(self, request, user_id):
+        user = self.get_user(user_id)
+        goal = getattr(user, "goal", None)
+        serializer = UserGoalSerializer(goal)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(request_body=UserGoalSerializer)
+    def post(self, request, user_id):
+        user = self.get_user(user_id)
+        goal, created = UserGoal.objects.get_or_create(user=user)
+        serializer = UserGoalSerializer(goal, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            # Serialize again to include the updated goal with days_by_deadline
+            response_serializer = UserGoalSerializer(goal)
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # /api/v1/posts/calendar/<int:user_id>
 class CalendarView(APIView):
@@ -44,12 +67,11 @@ class CalendarView(APIView):
     def get(self, request, user_id):
         user = self.get_user(user_id)
         streak = get_consecutive_success_days(user)
-        serializer = ConsecutiveDaysSerializer(data={"streak": streak})
+        serializer = ConsecutiveDaysSerializer(data={'streak': streak})
 
         if serializer.is_valid():
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 # /api/v1/posts/list
 class PostList(APIView):
@@ -61,7 +83,6 @@ class PostList(APIView):
         posts = Post.objects.all()
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 # /api/v1/posts/<int:user_id>
 class PostsByUser(APIView):
@@ -110,7 +131,8 @@ class PostsByUser(APIView):
         serializer = PostSerializer(post, data=request.data, partial=True)
         if serializer.is_valid():
             post = serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            post_serializer = PostSerializer(post)
+            return Response(post_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -124,7 +146,6 @@ class PostsByUser(APIView):
 
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 # /api/v1/posts/todo/<int:post_id>
 class ToDoView(APIView):
@@ -155,7 +176,6 @@ class ToDoView(APIView):
         todos = post.items.all()
         serializer = ToDoSerializer(todos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 # /api/v1/posts/todo/<int:post_id>/<int:todo_id>
 class ToDoEdit(APIView):
@@ -191,7 +211,6 @@ class ToDoEdit(APIView):
         todo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
 # /api/v1/posts/music/<int:post_id>
 class Spotify(APIView):
     # permission_classes = [IsAuthenticated]
@@ -213,9 +232,10 @@ class Spotify(APIView):
         post = self.get_post(post_id=post_id)
         return post.musics.first()
 
+    @swagger_auto_schema(query_serializer=SpotifyQuerySerializer)
     def get(self, request, post_id):
         # get songs' list from searched results (max: 50 songs)
-        query = request.query_params.get("query", None)
+        query = request.query_params.get('query', None)
         if not query:
             return Response({'error': 'Query parameter is required!'})
 
@@ -284,8 +304,6 @@ class Spotify(APIView):
             return Response({'error': 'No song exists'}, status=status.HTTP_404_NOT_FOUND,)
         current_song.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 
 # /api/v1/posts/timer/<int:post_id>
 class TimerView(APIView):

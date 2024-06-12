@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import CreateUserSerializer
 from drf_yasg.utils import swagger_auto_schema
-from users.utils  import generate_random_nickname
+from users.utils import generate_random_nickname
 import requests
 
 # Create your views here.
