@@ -8,7 +8,7 @@ from .serializers import *
 User = get_user_model()
 
 class MyPetView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
         print(request.user)

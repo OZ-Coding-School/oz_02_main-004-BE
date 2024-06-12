@@ -21,16 +21,16 @@ jobs:
         key: ${{ secrets.SERVER_SSH_KEY }}
         port: ${{ secrets.AWS_SSH_PORT }}
         script: |
+            cd ~/oz_02_main-004-BE
+            git stash
+            git switch develop
+            git pull origin develop
+
             cd ~/oz_02_main-004-BE/django
             # 모든 앱의 migrations 폴더 내의 __init__.py 파일을 제외한 모든 파일 삭제
             sudo find . -path "*/migrations/*.py" -not -name "__init__.py" -exec rm {} \;
             sudo find . -path "*/migrations/*.pyc" -exec rm {} \;
 
-            cd ~/oz_02_main-004-BE
-            git stash
-            git switch develop
-            git pull origin develop
-            cd django
             chmod +x entrypoint.sh
             cd ~/oz_02_main-004-BE
             sudo docker-compose -f docker-compose.yml up --build -d
