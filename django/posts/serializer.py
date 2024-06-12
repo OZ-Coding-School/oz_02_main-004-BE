@@ -1,14 +1,14 @@
 from rest_framework import serializers
 from posts.models import Post, Timer, Music, ToDo, UserGoal
-from users.serializers import UserSerializer
 from django.utils import timezone
+
 
 class UserGoalSerializer(serializers.ModelSerializer):
     days_by_deadline = serializers.SerializerMethodField()
 
     class Meta:
         model = UserGoal
-        fields = ['goal', 'd_day', 'days_by_deadline']
+        fields = ["goal", "d_day", "days_by_deadline"]
 
     def get_days_by_deadline(self, goal_obj):
         if goal_obj.d_day:
@@ -18,8 +18,9 @@ class UserGoalSerializer(serializers.ModelSerializer):
     # d_day field can only have future date (>tommorow) value
     def validate_d_day(self, value):
         if value <= timezone.now().date():
-            raise serializers.ValidationError('D-day cannot be in the past or present.')
+            raise serializers.ValidationError("D-day cannot be in the past or present.")
         return value
+
 
 class ConsecutiveDaysSerializer(serializers.Serializer):
     streak = serializers.IntegerField()
@@ -44,12 +45,21 @@ class ToDoEditSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    # user = UserSerializer(read_only=True)
     days_by_deadline = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = ('id', 'user', 'feeling_status', 'todo_progress', 'todo_date', 'memo', 'goal', 'd_day', 'days_by_deadline',)
+        fields = (
+            "id",
+            "user",
+            "feeling_status",
+            "todo_progress",
+            "todo_date",
+            "memo",
+            "goal",
+            "d_day",
+            "days_by_deadline",
+        )
         # depth = 1
 
     def get_days_by_deadline(self, goal_obj):
@@ -70,7 +80,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
         if value < timezone.now().date():
             raise serializers.ValidationError("todo date cannot be in the past.")
 
-        user = self.context.get('user_id')
+        user = self.context.get("user_id")
         print(user)
         # user = self.context['request'].user
         if Post.objects.filter(todo_date=value, user=user).exists():
@@ -79,7 +89,6 @@ class PostCreateSerializer(serializers.ModelSerializer):
 
 
 class PostDeleteSerializer(serializers.ModelSerializer):
-    # user = UserSerializer(read_only=True)
     class Meta:
         model = Post
         fields = ("todo_date",)

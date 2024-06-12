@@ -1,8 +1,5 @@
-import json
 from django.conf import settings
-from django.db import IntegrityError
 from posts.models import Post, ToDo, UserGoal
-from users.models import User
 from users.userviews import IsStaffUser
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
@@ -10,7 +7,6 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from posts.serializer import (
     PostSerializer,
     PostCreateSerializer,
@@ -40,18 +36,21 @@ from posts.utils import get_consecutive_success_days
 
 # /api/v1/posts/goal/<int:user_id>
 class UserGoalView(APIView):
-    def get_user(self, user_id):
-        return get_object_or_404(User, id=user_id)
+    # only logined user are allowed to get an access
+    permission_classes = [IsAuthenticated]
 
-    def get(self, request, user_id):
-        user = self.get_user(user_id)
+    def get_user(self, request):
+        return request.user
+
+    def get(self, request):
+        user = self.get_user(request)
         goal = getattr(user, "goal", None)
         serializer = UserGoalSerializer(goal)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=UserGoalSerializer)
-    def post(self, request, user_id):
-        user = self.get_user(user_id)
+    def post(self, request):
+        user = self.get_user(request)
         goal, created = UserGoal.objects.get_or_create(user=user)
         serializer = UserGoalSerializer(goal, data=request.data, partial=True)
         if serializer.is_valid():
@@ -64,11 +63,13 @@ class UserGoalView(APIView):
 
 # /api/v1/posts/calendar/<int:user_id>
 class CalendarView(APIView):
-    def get_user(self, user_id):
-        return get_object_or_404(User, id=user_id)
+    permission_classes = [IsAuthenticated]
 
-    def get(self, request, user_id):
-        user = self.get_user(user_id)
+    def get_user(self, request):
+        return request.user
+
+    def get(self, request):
+        user = self.get_user(request)
         streak = get_consecutive_success_days(user)
         serializer = ConsecutiveDaysSerializer(data={"streak": streak})
 
@@ -80,7 +81,7 @@ class CalendarView(APIView):
 # /api/v1/posts/list
 class PostList(APIView):
     # todo: 관리자만 접근 가능하도록 변경할것
-    # permission_classes = [IsAuthenticated, IsStaffUser]
+    permission_classes = [IsAuthenticated, IsStaffUser]
 
     # 전체 post list
     def get(self, request):
@@ -89,38 +90,33 @@ class PostList(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# /api/v1/posts/<int:user_id>
+# /api/v1/posts
 class PostsByUser(APIView):
     # todo: 로그인한 해당 유저만 접근가능
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
-    def get_user(self, user_id):
-        return get_object_or_404(User, id=user_id)
+    def get_user(self, request):
+        return request.user
 
     # get post list written by a certain user
-    def get_posts_by_user(self, user_id):
-        user = self.get_user(user_id)
+    def get_posts_by_user(self, request):
+        user = self.get_user(request)
         return Post.objects.filter(user=user)
 
     # get the post written on a certain day by user
-    def get_post(self, user_id, target_date):
-        user = self.get_user(user_id)
+    def get_post(self, request, target_date):
+        user = self.get_user(request)
         return Post.objects.filter(user=user, todo_date=target_date).first()
 
-    def get(self, request, user_id):
-        # if request.user.id != user_id:
-        #     return Response({'error': 'You do not have permission to access these posts.'}, status=status.HTTP_403_FORBIDDEN)
-
-        posts = self.get_posts_by_user(user_id)
+    def get(self, request):
+        posts = self.get_posts_by_user(request)
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=PostCreateSerializer)
-    def post(self, request, user_id):
-        user = self.get_user(user_id=user_id)
-        serializer = PostCreateSerializer(
-            data=request.data, context={"user_id": user_id}
-        )
+    def post(self, request):
+        user = self.get_user(request)
+        serializer = PostCreateSerializer(data=request.data, user=user)
         if serializer.is_valid():
             post = serializer.save(user=user)
             serializer = PostSerializer(post)
@@ -129,9 +125,10 @@ class PostsByUser(APIView):
 
     # 포스트 내용 변경 : 'todo_date' is required
     @swagger_auto_schema(request_body=PostCreateSerializer)
-    def put(self, request, user_id):
+    def put(self, request):
+        user = self.get_user(request)
         target_date = request.data.get("todo_date")
-        post = self.get_post(user_id=user_id, target_date=target_date)
+        post = self.get_post(user=user, target_date=target_date)
         if not post:
             return Response(
                 {"error": "Post Not Found"}, status=status.HTTP_400_BAD_REQUEST
@@ -147,9 +144,10 @@ class PostsByUser(APIView):
 
     # 포스트 삭제 : 'todo_date' is required
     @swagger_auto_schema(request_body=PostDeleteSerializer)
-    def delete(self, request, user_id):
+    def delete(self, request):
+        user = self.get_user(request)
         target_date = request.data.get("todo_date")
-        post = self.get_post(user_id=user_id, target_date=target_date)
+        post = self.get_post(user=user, target_date=target_date)
         if not post:
             return Response(
                 {"error": "Post does not exist!"},
@@ -163,7 +161,7 @@ class PostsByUser(APIView):
 # /api/v1/posts/todo/<int:post_id>
 class ToDoView(APIView):
     # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)
@@ -193,7 +191,7 @@ class ToDoView(APIView):
 
 # /api/v1/posts/todo/<int:post_id>/<int:todo_id>
 class ToDoEdit(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)
@@ -232,7 +230,7 @@ class ToDoEdit(APIView):
 
 # /api/v1/posts/music/<int:post_id>
 class Spotify(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -338,7 +336,7 @@ class Spotify(APIView):
 
 # /api/v1/posts/music/playing/<int:post_id>
 class MusicView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)
@@ -365,7 +363,7 @@ class MusicView(APIView):
 
 # /api/v1/posts/timer/<int:post_id>
 class TimerView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)
