@@ -40,11 +40,12 @@ SYSTEM_APPS = [
 ]
 
 CUSTOM_APPS = [
-    'common.apps.CommonConfig',
-    'users.apps.UsersConfig',
-    'posts.apps.PostsConfig',
-    'pets.apps.PetsConfig',
-    'recommendation.apps.RecommendationConfig',
+    "common.apps.CommonConfig",
+    "users.apps.UsersConfig",
+    "posts.apps.PostsConfig",
+    "pets.apps.PetsConfig",
+    "recommendation.apps.RecommendationConfig",
+    "guestbook.apps.GuestbookConfig",
 ]
 
 THIRD_PARTY_APPS = [
