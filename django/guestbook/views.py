@@ -66,3 +66,37 @@ class GuestBookCommentView(APIView):
             serializer.save(user=request.user, guestbook=guestbook)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class GuestBookCommentUpdateView(APIView):
+    # permission_classes = [IsAuthenticated]
+    def get_object(self, pk):
+        try:
+            return GuestBookComment.objects.get(pk=pk)
+        except GuestBookComment.DoesNotExist:
+            raise Http404
+
+    @swagger_auto_schema(request_body=GuestBookCommentSerializer)
+    def post(self, request, comment_id):
+        comment = self.get_object(comment_id)
+        serializer = GuestBookCommentSerializer(comment, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class GuestBookCommentDeleteView(APIView):
+    # permission_classes = [IsAuthenticated]
+    def get_object(self, pk):
+        try:
+            return GuestBookComment.objects.get(pk=pk)
+        except GuestBookComment.DoesNotExist:
+            raise Http404
+
+    def post(self, request, comment_id):
+        comment = self.get_object(comment_id)
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
