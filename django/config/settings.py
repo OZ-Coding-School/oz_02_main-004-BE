@@ -174,7 +174,8 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://localhost:8000', 'https://www.oz-02-main-04.xyz/', 'https://api.oz-02-main-04.xyz/', 'https://oz-02-main-04.xyz/',]
 CSRF_COOKIE_NAME = 'csrftoken'
 if platform_index == 'Linux':
-    CORS_ORIGIN_ALLOW_ALL = True    
+    CORS_ORIGIN_ALLOW_ALL = True
+    CSRF_COOKIE_DOMAIN = '.oz-02-main-04.xyz'
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = ['http://localhost:3000', 'http://localhost:8000', 'https://www.oz-02-main-04.xyz', 'https://api.oz-02-main-04.xyz', 'https://oz-02-main-04.xyz',]
