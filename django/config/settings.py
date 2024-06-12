@@ -31,46 +31,27 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 SYSTEM_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes', 'django.contrib.sessions',
+    'django.contrib.messages', 'django.contrib.staticfiles',
 ]
 
 CUSTOM_APPS = [
-    'common.apps.CommonConfig',
-    'users.apps.UsersConfig',
-    'posts.apps.PostsConfig',
-    'pets.apps.PetsConfig',
-    'recommendation.apps.RecommendationConfig',
+    'common.apps.CommonConfig', 'users.apps.UsersConfig', 'posts.apps.PostsConfig', 'pets.apps.PetsConfig',
+    'recommendation.apps.RecommendationConfig', 'guestbook.apps.GuestbookConfig',
 ]
 
 THIRD_PARTY_APPS = [
-    'rest_framework',
-    'rest_framework.authtoken',
-    'rest_framework_simplejwt',
-    'django.contrib.sites',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.kakao',
-    'corsheaders',
-    'drf_yasg',
+    'rest_framework', 'rest_framework.authtoken', 'rest_framework_simplejwt', 'django.contrib.sites',
+    'allauth', 'allauth.account', 'allauth.socialaccount', 'allauth.socialaccount.providers.kakao', 'corsheaders', 'drf_yasg',
 ]
 
 INSTALLED_APPS = SYSTEM_APPS + CUSTOM_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware', 'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware', 'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware', 'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware', 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -83,10 +64,8 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.debug', 'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth', 'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -194,13 +173,17 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://localhost:8000', 'https://www.oz-02-main-04.xyz/', 'https://api.oz-02-main-04.xyz/', 'https://oz-02-main-04.xyz/',]
 CSRF_COOKIE_NAME = 'csrftoken'
-
 if platform_index == 'Linux':
     CORS_ORIGIN_ALLOW_ALL = True
+    CSRF_COOKIE_DOMAIN = '.oz-02-main-04.xyz'
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = ['http://localhost:3000', 'http://localhost:8000', 'https://www.oz-02-main-04.xyz', 'https://api.oz-02-main-04.xyz', 'https://oz-02-main-04.xyz',]
-CORS_ALLOW_HEADERS = ['content-type', 'x-requested-with', 'authorization', 'accept', 'origin', 'x-csrftoken',]
+CORS_ALLOW_HEADERS = [
+    'access-control-allow-credentials', 'access-control-allow-origin', 'access-control-request-method', 'access-control-request-headers',
+    'accept', 'accept-encoding', 'accept-language', 'authorization', 'connection', 'content-type', 'dnt', 'credentials', 'host',
+    'origin', 'user-agent', 'x-csrftoken', 'csrftoken', 'x-requested-with',
+    ]
 CORS_ALLOW_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
