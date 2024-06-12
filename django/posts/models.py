@@ -115,7 +115,7 @@ class Music(CommonModel):
     song_url = models.CharField(
         max_length=255, blank=True, null=True, validators=[URLValidator()]
     )
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="musics")
+    post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name="music")
 
     def __str__(self):
         return f"Title: {self.title}, POST: {self.post.id}"

@@ -9,6 +9,11 @@ urlpatterns = [
         "todo/<int:post_id>/<int:todo_id>", views.ToDoEdit.as_view(), name="todo-edit"
     ),
     path("music/<int:post_id>", views.Spotify.as_view(), name="spotify-api"),
+    path(
+        "music/playing/<int:post_id>",
+        views.MusicView.as_view(),
+        name="get-current-song",
+    ),
     path("timer/<int:post_id>", views.TimerView.as_view(), name="timer-api"),
     path(
         "calendar/<int:user_id>",
