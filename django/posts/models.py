@@ -1,7 +1,6 @@
 from django.db import models
 from common.models import CommonModel
 from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
 from users.models import User
 from django.utils import timezone
 from datetime import timedelta

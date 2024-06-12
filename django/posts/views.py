@@ -25,8 +25,7 @@ from posts.serializer import (
 )
 from drf_yasg.utils import swagger_auto_schema
 
-# spotify
-# reference : https://spotipy.readthedocs.io/en/2.24.0/#examples
+# spotify reference : https://spotipy.readthedocs.io/en/2.24.0/#examples
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
