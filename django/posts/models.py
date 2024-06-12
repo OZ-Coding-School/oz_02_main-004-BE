@@ -24,9 +24,13 @@ class UserGoal(CommonModel):
         posts = Post.objects.filter(user=self.user, todo_date__gte=today)
 
         if self.d_day is not None:
+            posts_to_none = posts.filter(todo_date__gt=self.d_day)
             posts = posts.filter(todo_date__lte=self.d_day)
+        else:
+            posts_to_none = Post.objects.none()  # empty queryset
 
-        # save() 여러번 호출 대신 한꺼번에 업데이트
+        # 각 쿼리셋 한꺼번에 업데이트
+        posts_to_none.update(goal=None, d_day=None)
         posts.update(goal=self.goal, d_day=self.d_day)
 
 
