@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from guestbook.models import GuestBook, GuestBookComment
+from guestbook.models import GuestBookComment
 from users.models import User
 
 class GuestBookCommentSerializer(serializers.ModelSerializer):
