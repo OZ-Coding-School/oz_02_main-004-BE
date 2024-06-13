@@ -51,18 +51,31 @@ class GuestBookCommentView(APIView):
             return GuestBookComment.objects.get(pk=pk)
         except GuestBookComment.DoesNotExist:
             raise Http404
+        
 
+    @swagger_auto_schema(
+        operation_summary="방명록의 전체 게시물 조회",
+        operation_description="조회 원하는 유저를 path 파라미터에 입력",
+        manual_parameters=[
+            openapi.Parameter(
+                "user_id",
+                openapi.IN_PATH,
+                description="검색원하는 유저 ID",
+                type=openapi.TYPE_INTEGER,
+            ),
+        ],
+        tags=["방명록"],
+    )
     def get(self, request, user_id):
         user = User.objects.get(id=user_id)
         gb = GuestBook.objects.get(user=user)
-
         comments = GuestBookComment.objects.filter(guestbook_id=gb.id)
         serializer = GuestBookCommentSerializer(comments, many=True)
         return Response(serializer.data)
 
     @swagger_auto_schema(
-        operation_summary="방명록에 게시물 추가하기",
-        operation_description="/guestbook/comments/ 이 주소로 바뀔예정입니다.",
+        operation_summary="방명록에 게시물 추가",
+        operation_description="배포시 /guestbook/comments/ 이 주소로 바뀔예정입니다.",
         manual_parameters=[
             openapi.Parameter(
                 "user_id",
@@ -133,7 +146,33 @@ class GuestBookCommentUpdateView(APIView):
             return GuestBookComment.objects.get(pk=pk)
         except GuestBookComment.DoesNotExist:
             raise Http404
-
+        
+    @swagger_auto_schema(
+        operation_summary="방명록에 게시물 수정하기",
+        operation_description="/guestbook/comments/{user_id}/에서 comment_id 조회가능",
+        manual_parameters=[
+            openapi.Parameter(
+                "comment_id",
+                openapi.IN_PATH,
+                description="수정을 원하는 방명록 게시물 ID",
+                type=openapi.TYPE_INTEGER,
+            ),
+        ],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "content": openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description="수정원하는 게시물의 내용",
+                ),
+                "user": openapi.Schema(
+                    type=openapi.TYPE_INTEGER,
+                    description="현재 로그인 중인 유저 ID",
+                ),
+            },
+        ),
+        tags=["방명록"],
+    )
     @swagger_auto_schema(request_body=GuestBookCommentSerializer)
     def post(self, request, comment_id):
         comment = self.get_object(comment_id)
@@ -154,6 +193,20 @@ class GuestBookCommentDeleteView(APIView):
         except GuestBookComment.DoesNotExist:
             raise Http404
 
+
+    @swagger_auto_schema(
+        operation_summary="방명록에 게시물 삭제",
+        operation_description="/guestbook/comments/{user_id}/에서 comment_id 조회가능",
+        manual_parameters=[
+            openapi.Parameter(
+                "comment_id",
+                openapi.IN_PATH,
+                description="삭제를 원하는 방명록 게시물 ID",
+                type=openapi.TYPE_INTEGER,
+            ),
+        ],
+        tags=["방명록"],
+    )
     def post(self, request, comment_id):
         comment = self.get_object(comment_id)
         comment.delete()
