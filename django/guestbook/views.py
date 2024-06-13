@@ -173,7 +173,6 @@ class GuestBookCommentUpdateView(APIView):
         ),
         tags=["방명록"],
     )
-    @swagger_auto_schema(request_body=GuestBookCommentSerializer)
     def post(self, request, comment_id):
         comment = self.get_object(comment_id)
         serializer = GuestBookCommentSerializer(
