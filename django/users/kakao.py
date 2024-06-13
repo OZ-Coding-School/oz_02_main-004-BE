@@ -77,9 +77,8 @@ class KakaoCallBackView(APIView):
             refresh = RefreshToken.for_user(user)
 
             # 쿠키에 토큰 저장 (세션 쿠키로 설정)
-            # response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
+            response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
             # response = HttpResponseRedirect('http://localhost:8000/api/v1/users/myinfo')
-            response = HttpResponseRedirect('https//localhost:3000') # 로그인 완료 시 리디렉션할 URL
 
             # CSRF 토큰 설정
             csrf_token_value = get_token(request)
