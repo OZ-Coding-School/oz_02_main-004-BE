@@ -16,7 +16,7 @@ class GuestBookViewdetail(APIView):
     def get(self, request, nickname):
         users = User.objects.filter(nickname__icontains=nickname)
         if not users.exists():
-            return Response({"error": "No users found"}, status=404)
+            return Response({'error': 'No users found'}, status=404)
 
         serializer = GuestBookIdUserSerializer(users, many=True)
         return Response(serializer.data)
