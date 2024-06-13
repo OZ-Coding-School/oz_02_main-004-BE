@@ -75,6 +75,11 @@ class PostCreateSerializer(serializers.ModelSerializer):
         model = Post
         fields = ("feeling_status", "todo_date", "memo")
 
+    def create(self, validated_data):
+        user = self.context["request"].user
+        validated_data.pop("user", None)  # Ensure user is not part of validated_data
+        return Post.objects.create(user=user, **validated_data)
+
     # 새로 생성되는 todo_date는 today 이전 날짜로는 생성되지 않는다
     def validate_todo_date(self, value):
         if value < timezone.now().date():

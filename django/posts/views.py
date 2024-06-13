@@ -33,7 +33,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from posts.utils import get_consecutive_success_days
 
 
-# /api/v1/posts/goal/<int:user_id>
+# /api/v1/posts/goal
 class UserGoalView(APIView):
     # only logined user are allowed to get an access
     permission_classes = [IsAuthenticated]
@@ -60,7 +60,7 @@ class UserGoalView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# /api/v1/posts/calendar/<int:user_id>
+# /api/v1/posts/calendar/
 class CalendarView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -115,9 +115,10 @@ class PostsByUser(APIView):
     @swagger_auto_schema(request_body=PostCreateSerializer)
     def post(self, request):
         user = self.get_user(request)
-        serializer = PostCreateSerializer(data=request.data, user=user)
+        data = request.data.copy()
+        serializer = PostCreateSerializer(data=data, context={"request": request})
         if serializer.is_valid():
-            post = serializer.save(user=user)
+            post = serializer.save()  # Save with the user
             serializer = PostSerializer(post)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -127,7 +128,7 @@ class PostsByUser(APIView):
     def put(self, request):
         user = self.get_user(request)
         target_date = request.data.get("todo_date")
-        post = self.get_post(user=user, target_date=target_date)
+        post = self.get_post(request, target_date=target_date)
         if not post:
             return Response(
                 {"error": "Post Not Found"}, status=status.HTTP_400_BAD_REQUEST
@@ -146,7 +147,7 @@ class PostsByUser(APIView):
     def delete(self, request):
         user = self.get_user(request)
         target_date = request.data.get("todo_date")
-        post = self.get_post(user=user, target_date=target_date)
+        post = self.get_post(request, target_date=target_date)
         if not post:
             return Response(
                 {"error": "Post does not exist!"},
