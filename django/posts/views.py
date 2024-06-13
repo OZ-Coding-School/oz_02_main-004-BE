@@ -115,8 +115,8 @@ class PostsByUser(APIView):
     @swagger_auto_schema(request_body=PostCreateSerializer)
     def post(self, request):
         user = self.get_user(request)
-        data = request.data.copy()
-        serializer = PostCreateSerializer(data=data, context={"request": request})
+        data = request.data
+        serializer = PostCreateSerializer(data=data, context={"user": user})
         if serializer.is_valid():
             post = serializer.save()  # Save with the user
             serializer = PostSerializer(post)
@@ -134,7 +134,9 @@ class PostsByUser(APIView):
                 {"error": "Post Not Found"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        serializer = PostSerializer(post, data=request.data, partial=True)
+        serializer = PostSerializer(
+            post, data=request.data, partial=True, context={"user": user}
+        )
         if serializer.is_valid():
             post = serializer.save()
             post_serializer = PostSerializer(post)

@@ -76,17 +76,17 @@ class PostCreateSerializer(serializers.ModelSerializer):
         fields = ("feeling_status", "todo_date", "memo")
 
     def create(self, validated_data):
-        user = self.context["request"].user
-        validated_data.pop("user", None)  # Ensure user is not part of validated_data
+        user = self.context["user"]
         return Post.objects.create(user=user, **validated_data)
 
     # 새로 생성되는 todo_date는 today 이전 날짜로는 생성되지 않는다
     def validate_todo_date(self, value):
+        user = self.context["user"]
+        print(user)
+
         if value < timezone.now().date():
             raise serializers.ValidationError("todo date cannot be in the past.")
 
-        user = self.context.get("user_id")
-        print(user)
         # user = self.context['request'].user
         if Post.objects.filter(todo_date=value, user=user).exists():
             raise serializers.ValidationError("You already have a post for this date.")
