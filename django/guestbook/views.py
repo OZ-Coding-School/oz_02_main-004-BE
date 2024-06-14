@@ -17,7 +17,7 @@ class GuestBookViewdetail(APIView):
     @swagger_auto_schema(
         operation_summary='유저의 닉네임으로 유저 ID 검색',
         operation_description='유저 닉네임에 해당 문자열이 포함된 모든 유저 ID를 검색합니다.',
-        manual_parameters=[openapi.Parameter('nickname', openapi.IN_PATH, description='유저 닉네임', type=openapi.TYPE_INTEGER,),],
+        manual_parameters=[openapi.Parameter('nickname', openapi.IN_PATH, description='유저 닉네임', type=openapi.TYPE_STRING,),],
         tags=['방명록'],
     )
     def get(self, request, nickname):
@@ -34,7 +34,7 @@ class GuestBookView(APIView):
     @swagger_auto_schema(
         operation_summary='유저의 닉네임으로 유저 ID 검색',
         operation_description='정확히 일치하는 유저 닉네임의 방명록의 게시물 ID를 검색합니다.  배포시 /guestbook/ 으로 변경 예정',
-        manual_parameters=[openapi.Parameter('nickname', openapi.IN_PATH, description='유저 닉네임', type=openapi.TYPE_INTEGER,),],
+        manual_parameters=[openapi.Parameter('nickname', openapi.TYPE_STRING, description='유저 닉네임', type=openapi.TYPE_INTEGER,),],
         tags=['방명록'],
     )
     # api/v1/guestbook/
