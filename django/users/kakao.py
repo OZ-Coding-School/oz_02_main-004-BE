@@ -77,17 +77,18 @@ class KakaoCallBackView(APIView):
             refresh = RefreshToken.for_user(user)
 
             # 쿠키에 토큰 저장 (세션 쿠키로 설정)
-            response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/profile') # 로그인 완료 시 리디렉션할 URL
+            response = HttpResponseRedirect('https://www.oz-02-main-04.xyz/') # 로그인 완료 시 리디렉션할 URL
             # response = HttpResponseRedirect('http://localhost:8000/api/v1/users/myinfo')
-
+            
             # CSRF 토큰 설정
             csrf_token_value = get_token(request)
-            response.set_cookie('csrftoken', csrf_token_value, domain='.oz-02-main.xyz', path='/')
+            response.set_cookie('csrftoken', csrf_token_value, domain='.oz-02-main.xyz', path='/')            
 
             # 배포 환경에서만 secure=True와 samesite='None' 설정
             secure_cookie = request.is_secure()
             response.set_cookie('access_token', str(refresh.access_token), domain='.oz-02-main-04.xyz', path='/')
             response.set_cookie('refresh_token', str(refresh), domain='.oz-02-main-04.xyz', path='/')
+            
             return response
         else:
             return Response({'message': '카카오 계정 이메일이 없습니다.'}, status=status.HTTP_400_BAD_REQUEST,)
@@ -99,13 +100,8 @@ class KakaoLogoutView(APIView):
         logout(request)
         response = Response({'message': '로그아웃 되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
         domain = '.oz-02-main-04.xyz'
-        cookies_to_delete = ['access_token', 'refresh_token']
+        cookies_to_delete = ['access_token', 'refresh_token', 'csrftoken', 'sessionid']
         for cookie in cookies_to_delete:
             response.delete_cookie(cookie, domain=domain, path='/')
-
-        api_domain = 'api.oz-02-main-04.xyz'
-        api_cookies_to_delete = ['csrftoken', 'sessionid']
-        for cookie in api_cookies_to_delete:
-            response.delete_cookie(cookie, domain=api_domain, path='/')
 
         return response
