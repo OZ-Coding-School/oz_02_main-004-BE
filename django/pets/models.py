@@ -119,6 +119,8 @@ class Pet(CommonModel):
 
         randomly_chosen_item = random.choice(items)
 
+        output_item = None
+
         if isinstance(randomly_chosen_item, SnackType):
             # create or get snack instance
             snack, created = Snack.objects.get_or_create(
@@ -126,6 +128,7 @@ class Pet(CommonModel):
             )
             snack.quantity += 1
             snack.save()
+            output_item = {'type': 'snack', 'name': snack.snack_type.name, 'quantity': snack.quantity}
         else:
             # create or get closet instance
             closet, created = Closet.objects.get_or_create(pet=self)
@@ -133,12 +136,15 @@ class Pet(CommonModel):
             # check if the chosen item is an instance of Accessory
             if isinstance(randomly_chosen_item, Accessory):
                 closet.accessories.add(randomly_chosen_item)
+                output_item = {'type': 'accessory', 'name': randomly_chosen_item.item_name}
             elif isinstance(randomly_chosen_item, Background):
                 closet.backgrounds.add(randomly_chosen_item)
+                output_item = {'type': 'background', 'name': randomly_chosen_item.item_name}
 
         # update random_boxes
         self.random_boxes -= 1
         self.save()
+        return output_item
 
     def __str__(self):
         return f"{self.user.email}의 펫"
