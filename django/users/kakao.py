@@ -22,8 +22,8 @@ class KakaoView(APIView):
         operation_description='카카오 로그인 페이지로 이동합니다. \n\n Get 요청을 해주세요 \n\n따로 입력받을 파라미터는 없습니다.',
     )
     def get(self, request):
-        kakao_api = 'https://kauth.kakao.com/oauth/authorize?response_type=code',
-        redirect_uri = 'https://api.oz-02-main-04.xyz/api/v1/users/kakao/callback',
+        kakao_api = 'https://kauth.kakao.com/oauth/authorize?response_type=code'
+        redirect_uri = 'https://api.oz-02-main-04.xyz/api/v1/users/kakao/callback'
         # redirect_uri = 'http://localhost:8000/api/v1/users/kakao/callback'
         client_id = '92ec542f65f17550dbc2fbf553c44822'
         return redirect(f'{kakao_api}&client_id={client_id}&redirect_uri={redirect_uri}')
