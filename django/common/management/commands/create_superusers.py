@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 import random
 import string
+from users.utils import generate_random_nickname
 
 User = get_user_model()
 
@@ -21,9 +22,9 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         count = kwargs['count']
         for i in range(1, count + 1):
-            email = f'user{i}@example.com'
+            email = f'{i}@admin.com'
             password = '1234'
-            nickname = self.generate_unique_nickname(f'nickname{i}')
+            nickname = generate_random_nickname()
             
             if not User.objects.filter(email=email).exists():
                 user = User(email=email, nickname=nickname)
