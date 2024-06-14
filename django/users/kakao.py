@@ -82,16 +82,13 @@ class KakaoCallBackView(APIView):
             
             # CSRF 토큰 설정
             csrf_token_value = get_token(request)
-            # response.set_cookie('csrftoken', csrf_token_value, domain='.oz-02-main.xyz', path='/')
-            response.set_cookie('csrftoken', csrf_token_value, domain='localhost:3000', path='/')
+            response.set_cookie('csrftoken', csrf_token_value, domain='.oz-02-main.xyz', path='/')            
 
             # 배포 환경에서만 secure=True와 samesite='None' 설정
             secure_cookie = request.is_secure()
-            # response.set_cookie('access_token', str(refresh.access_token), domain='.oz-02-main-04.xyz', path='/')
-            response.set_cookie('access_token', str(refresh.access_token), domain='localhost:3000', path='/')
-            # response.set_cookie('refresh_token', str(refresh), domain='.oz-02-main-04.xyz', path='/')
-            response.set_cookie('refresh_token', str(refresh), domain='localhost:3000', path='/')
-
+            response.set_cookie('access_token', str(refresh.access_token), domain='.oz-02-main-04.xyz', path='/')
+            response.set_cookie('refresh_token', str(refresh), domain='.oz-02-main-04.xyz', path='/')
+            
             return response
         else:
             return Response({'message': '카카오 계정 이메일이 없습니다.'}, status=status.HTTP_400_BAD_REQUEST,)
