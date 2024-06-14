@@ -1,11 +1,20 @@
 from rest_framework import serializers
-from guestbook.models import GuestBookComment
+from guestbook.models import GuestBookComment, GuestBook
 from users.models import User
 
+
+
 class GuestBookCommentSerializer(serializers.ModelSerializer):
+    user_nickname = serializers.SerializerMethodField()
+
     class Meta:
         model = GuestBookComment
         fields = '__all__'
+        extra_fields = ['user_nickname']
+
+    def get_user_nickname(self, obj):
+        return obj.user.nickname if obj.user else None
+
 
 class TestGuestBookCommentSerializer(serializers.ModelSerializer):
     guestbook_user = serializers.IntegerField(required=True, help_text='This is a custom field.')
