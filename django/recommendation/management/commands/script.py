@@ -4,16 +4,19 @@ from posts.models import Post, ToDo
 from recommendation.models import UserToDoInteraction
 import random
 from django.utils import timezone
+from faker import Faker
 
 class Command(BaseCommand):
     help = 'Creates users, ToDo items, and interactions'
 
     def handle(self, *args, **kwargs):
+
+        fake = Faker()
+
         # 사용자 생성
         users = []
-        posts = []
-        for i in range(1, 11):
-            user = User.objects.create_user(nickname=f'user{i}', email=f'user{i}@example.com', password='petodo1234')
+        for _ in range(100):
+            user = User.objects.create_user(nickname=fake.user_name(), email=fake.email(), password='petodo1234',)
             users.append(user)
 
         # Post 생성
@@ -23,6 +26,7 @@ class Command(BaseCommand):
             posts.append(post)
 
         # ToDo 항목 생성
+        categories = ['Work', 'Personal', 'Health', 'Finance', 'Education']
         todo_items = []
         for i, post in enumerate(posts):
             for j in range(2):  # Creating 2 ToDo items per post

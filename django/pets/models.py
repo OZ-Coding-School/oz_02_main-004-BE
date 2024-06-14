@@ -92,4 +92,3 @@ class Snack(CommonModel):
 
     def __str__(self):
         return f'{self.pet.user.email}의 {self.snack_type.name} ({self.quantity}개)'
-

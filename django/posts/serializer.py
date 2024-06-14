@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from posts.models import Post, Timer, Music, ToDo, UserGoal
-from users.serializers import UserSerializer
 from django.utils import timezone
 
 class UserGoalSerializer(serializers.ModelSerializer):
@@ -40,7 +39,6 @@ class ToDoEditSerializer(serializers.ModelSerializer):
         fields = ('todo_item', 'done')
 
 class PostSerializer(serializers.ModelSerializer):
-    # user = UserSerializer(read_only=True)
     days_by_deadline = serializers.SerializerMethodField()
 
     class Meta:
@@ -58,20 +56,23 @@ class PostCreateSerializer(serializers.ModelSerializer):
         model = Post
         fields = ('feeling_status', 'todo_date', 'memo')
 
+    def create(self, validated_data):
+        user = self.context['user']
+        return Post.objects.create(user=user, **validated_data)
+
     # 새로 생성되는 todo_date는 today 이전 날짜로는 생성되지 않는다
     def validate_todo_date(self, value):
+        user = self.context['user']
+        print(user)
+
         if value < timezone.now().date():
             raise serializers.ValidationError('todo date cannot be in the past.')
 
-        user = self.context.get('user_id')
-        print(user)
-        # user = self.context['request'].user
         if Post.objects.filter(todo_date=value, user=user).exists():
             raise serializers.ValidationError('You already have a post for this date.')
         return value
 
 class PostDeleteSerializer(serializers.ModelSerializer):
-    # user = UserSerializer(read_only=True)
     class Meta:
         model = Post
         fields = ('todo_date',)
@@ -81,10 +82,23 @@ class SpotifySerializer(serializers.ModelSerializer):
         model = Music
         fields = '__all__'
 
+class SpotifySearchSerializer(serializers.Serializer):
+    album = serializers.CharField(max_length=255)
+    release_date = serializers.DateField()
+    singer = serializers.CharField(max_length=255)
+    title = serializers.CharField(max_length=255)
+    song_url = serializers.URLField(allow_null=True)
+
 class SongCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Music
         fields = ('singer', 'album', 'title', 'release_date', 'song_url')
+
+    def validate(self, data):
+        post = data.get('post')
+        if Music.objects.filter(post=post).exists():
+            raise serializers.ValidationError(f'Post {post.id} already has a music instance.')
+        return data
 
 class SpotifyQuerySerializer(serializers.Serializer):
     query = serializers.CharField(required=True, max_length=255)
