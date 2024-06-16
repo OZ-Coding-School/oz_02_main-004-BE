@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import *
+from .views.deploy import *
+from .views.testForLocal import *
 
 urlpatterns = [
     path('closet/accessories/<int:pet_id>/', ClosetAccessoriesView.as_view(), name='closet-accessories'),
