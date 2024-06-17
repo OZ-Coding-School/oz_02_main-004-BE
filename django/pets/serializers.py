@@ -30,6 +30,7 @@ class PetSerializer(serializers.ModelSerializer):
     rice_quantity = serializers.SerializerMethodField()
     snack_quantity = serializers.SerializerMethodField()
     active_pet = PetCollectionSerializer()
+    hunger_degree_status = serializers.SerializerMethodField()
 
     def get_rice_quantity(self, obj):
         rice_type = SnackType.objects.get(name='rice')
@@ -41,27 +42,46 @@ class PetSerializer(serializers.ModelSerializer):
         snack_snack = Snack.objects.filter(pet=obj, snack_type=snack_type).first()
         return snack_snack.quantity if snack_snack else 0
     
+    def get_hunger_degree_status(self, obj):
+        from datetime import datetime, time, timedelta
+        from django.utils import timezone
+
+        current_time = timezone.now()
+        today_5am = timezone.make_aware(datetime.combine(current_time.date(), time(5, 0)))
+
+        if obj.hunger_degree and obj.hunger_degree >= today_5am:
+            return "yes"
+        return "no"
+
+    
     class Meta:
         model = Pet
         fields = [
             'user', 'point', 'hunger_degree', 'random_boxes', 'pet_rating',
             'primary_accessory', 'primary_background', 'primary_pet',
-            'rice_quantity', 'snack_quantity', 'active_pet'
+            'rice_quantity', 'snack_quantity', 'active_pet', 'hunger_degree_status'
         ]
 
     
 class PetMainSerializer(PetSerializer):
     class Meta:
         model = Pet
-        fields = ['user', 'point', 'hunger_degree', 'random_boxes', 'pet_rating', 'primary_accessory', 'primary_background', 'rice_quantity','snack_quantity', 'active_pet']
+        fields = ['user', 'pet_rating', 'point', 'hunger_degree_status', 'active_pet', 'primary_background', 'random_boxes', 'rice_quantity','snack_quantity']
 
 
-class PetShareSerializer(PetSerializer):
+class LoopUpPetSerializer(PetSerializer):
+    nickname = serializers.SerializerMethodField()
+    guestbook_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Pet
-        fields = ['user', 'point', 'hunger_degree', 'random_boxes', 'pet_rating', 'primary_accessory', 'primary_background', 'primary_pet', 'rice_quantity','snack_quantity']
+        fields = ['user', 'nickname', 'pet_rating', 'point', 'hunger_degree_status', 'primary_pet', 'primary_background', 'guestbook_url']
 
+    def get_nickname(self, obj):
+        return obj.user.nickname
 
+    def get_guestbook_url(self, obj):
+        return f'/guestbook/comments/{obj.user.id}/'
 
 
 

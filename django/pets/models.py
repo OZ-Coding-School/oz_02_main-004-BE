@@ -191,7 +191,7 @@ class Snack(CommonModel):
     snack_type = models.ForeignKey(
         SnackType, on_delete=models.CASCADE, related_name="snacks", verbose_name="종류"
     )  # 밥, 간식 구분
-    quantity = models.IntegerField(verbose_name="개수", default=1)
+    quantity = models.IntegerField(verbose_name="개수", default=0)
 
     def __str__(self):
         return f"{self.pet.user.email}의 {self.snack_type.name} ({self.quantity}개)"
