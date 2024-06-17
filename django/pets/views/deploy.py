@@ -27,7 +27,7 @@ class MyPetView(APIView):
     def get(self, request):
         try:
             pet = Pet.objects.get(user=request.user)
-            serializer = PetSerializer(pet)
+            serializer = PetMainSerializer(pet)
             return Response(serializer.data)
         except Pet.DoesNotExist:
             return Response(
@@ -35,8 +35,14 @@ class MyPetView(APIView):
             )
 
 class FeedRiceView(APIView):
-    def post(self, request, pet_id):
-        pet = get_object_or_404(Pet, id=pet_id)
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary='( 4 )',
+        tags=['펫'],
+    )
+    def post(self, request):
+        pet = get_object_or_404(Pet, user=request.user)
         snack_type = get_object_or_404(SnackType, name="rice")
 
         # Find the snack instance for the pet and the given snack type
@@ -121,8 +127,14 @@ class FeedRiceView(APIView):
 
 
 class FeedSnackView(APIView):
-    def post(self, request, pet_id):
-        pet = get_object_or_404(Pet, id=pet_id)
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary='( 3 )',
+        tags=['펫'],
+    )
+    def post(self, request):
+        pet = get_object_or_404(Pet, user=request.user)
         snack_type = get_object_or_404(SnackType, name="snack")
 
         # Find the snack instance for the pet and the given snack type
@@ -207,17 +219,17 @@ class FeedSnackView(APIView):
 
 
 class OpenRandomBoxView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
-    def get_pet(self, user_id):
-        return get_object_or_404(Pet, id=user_id)
-
-    def post(self, request, user_id):
-        # login 연계시 변경할 코드
-        # user = request.user
-        # pet = user.pet
-
-        pet = self.get_pet(user_id)
+    def get_pet(self, request_user):
+        return get_object_or_404(Pet, user=request_user)
+    
+    @swagger_auto_schema(
+        operation_summary='( 2 )',
+        tags=['펫'],
+    )
+    def post(self, request):
+        pet = self.get_pet(request.user)
         try:
             output_item = pet.open_random_boxes()
             return Response(
@@ -237,8 +249,12 @@ class OpenRandomBoxView(APIView):
 
 
 class ClosetAccessoriesView(APIView):
-    def get(self, request, pet_id):
-        pet = get_object_or_404(Pet, id=pet_id)
+    @swagger_auto_schema(
+        operation_summary='( 8 )',
+        tags=['펫'],
+    )
+    def get(self, request):
+        pet = get_object_or_404(Pet, user=request.user)
         closet = get_object_or_404(Closet, pet=pet)
         accessories = closet.accessories.all()
         serializer = AccessorySerializer(accessories, many=True)
@@ -246,8 +262,12 @@ class ClosetAccessoriesView(APIView):
 
 
 class ClosetBackgroundsView(APIView):
-    def get(self, request, pet_id):
-        pet = get_object_or_404(Pet, id=pet_id)
+    @swagger_auto_schema(
+        operation_summary='( 9 )',
+        tags=['펫'],
+    )
+    def get(self, request):
+        pet = get_object_or_404(Pet, user=request.user)
         closet = get_object_or_404(Closet, pet=pet)
         backgrounds = closet.backgrounds.all()
         serializer = BackgroundSerializer(backgrounds, many=True)
@@ -255,8 +275,12 @@ class ClosetBackgroundsView(APIView):
 
 
 class ClosetPetsView(APIView):
-    def get(self, request, pet_id):
-        pet = get_object_or_404(Pet, id=pet_id)
+    @swagger_auto_schema(
+        operation_summary='( 10 )',
+        tags=['펫'],
+    )
+    def get(self, request):
+        pet = get_object_or_404(Pet, user=request.user)
         closet = get_object_or_404(Closet, pet=pet)
         pets = closet.pet_collections.all()
         serializer = PetCollectionSerializer(pets, many=True)
@@ -264,8 +288,11 @@ class ClosetPetsView(APIView):
 
 
 class SelectPrimaryAccessoryView(APIView):
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        operation_summary='( 6 )',
+        tags=['펫'],            
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
@@ -276,8 +303,8 @@ class SelectPrimaryAccessoryView(APIView):
             },
         ),
     )
-    def post(self, request, pet_id):
-        pet = get_object_or_404(Pet, id=pet_id)
+    def post(self, request):
+        pet = get_object_or_404(Pet, user=request.user)
         item_name = request.data.get("item_name")
         accessory = get_object_or_404(Accessory, item_name=item_name)
 
@@ -297,9 +324,11 @@ class SelectPrimaryAccessoryView(APIView):
 
 
 class SelectPrimaryBackgroundView(APIView):
-
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        operation_summary='( 7 )',
+        tags=['펫'],            
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
@@ -311,7 +340,7 @@ class SelectPrimaryBackgroundView(APIView):
         ),
     )
     def post(self, request, pet_id):
-        pet = get_object_or_404(Pet, id=pet_id)
+        pet = get_object_or_404(Pet, user=request.user)
         item_name = request.data.get("item_name")
         background = get_object_or_404(Background, item_name=item_name)
 
@@ -332,8 +361,11 @@ class SelectPrimaryBackgroundView(APIView):
 
 
 class SelectPrimaryPetView(APIView):
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        operation_summary='( 5 )',
+        tags=['펫'],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
@@ -344,8 +376,8 @@ class SelectPrimaryPetView(APIView):
             },
         ),
     )
-    def post(self, request, pet_id):
-        pet = get_object_or_404(Pet, id=pet_id)
+    def post(self, request):
+        pet = get_object_or_404(Pet, user=request.user)
         item_name = request.data.get("item_name")
         selected_pet = get_object_or_404(PetCollection, pet_name=item_name)
 
@@ -361,3 +393,21 @@ class SelectPrimaryPetView(APIView):
         return Response(
             {"message": "Primary pet selected successfully"}, status=status.HTTP_200_OK
         )
+
+
+class LookUpPetView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary='( 11 )',
+        tags=['펫'],
+    )
+    def get(self, request, user_id):
+        try:
+            pet = Pet.objects.get(user_id=user_id)
+            serializer = LoopUpPetSerializer(pet)
+            return Response(serializer.data)
+        except Pet.DoesNotExist:
+            return Response(
+                {"error": "Pet not found"}, status=status.HTTP_404_NOT_FOUND
+            )
