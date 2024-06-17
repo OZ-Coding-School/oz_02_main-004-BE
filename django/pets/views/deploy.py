@@ -20,7 +20,7 @@ class MyPetView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary='( 1 ) 펫 메인페이지 정보 조회',
+        operation_summary='( 1 ) 펫 메인페이지 정보 조회 - MainPage',
         operation_description='현재 로그인 중인 유저의 펫 메인페이지 정보를 조회 합니다.',
         tags=['펫'],
     )
@@ -38,7 +38,7 @@ class FeedRiceView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary='( 4 )',
+        operation_summary='( 4 ) - MainPage',
         tags=['펫'],
     )
     def post(self, request):
@@ -130,7 +130,7 @@ class FeedSnackView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary='( 3 )',
+        operation_summary='( 3 ) - MainPage',
         tags=['펫'],
     )
     def post(self, request):
@@ -225,7 +225,7 @@ class OpenRandomBoxView(APIView):
         return get_object_or_404(Pet, user=request_user)
     
     @swagger_auto_schema(
-        operation_summary='( 2 )',
+        operation_summary='( 2 ) - RandomBox',
         tags=['펫'],
     )
     def post(self, request):
@@ -250,7 +250,7 @@ class OpenRandomBoxView(APIView):
 
 class ClosetAccessoriesView(APIView):
     @swagger_auto_schema(
-        operation_summary='( 8 )',
+        operation_summary='( 8 ) - Closet',
         tags=['펫'],
     )
     def get(self, request):
@@ -263,7 +263,7 @@ class ClosetAccessoriesView(APIView):
 
 class ClosetBackgroundsView(APIView):
     @swagger_auto_schema(
-        operation_summary='( 9 )',
+        operation_summary='( 9 ) - Closet',
         tags=['펫'],
     )
     def get(self, request):
@@ -276,7 +276,7 @@ class ClosetBackgroundsView(APIView):
 
 class ClosetPetsView(APIView):
     @swagger_auto_schema(
-        operation_summary='( 10 )',
+        operation_summary='( 10 ) - Closet',
         tags=['펫'],
     )
     def get(self, request):
@@ -291,7 +291,7 @@ class SelectPrimaryAccessoryView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary='( 6 )',
+        operation_summary='( 6 ) - Closet',
         tags=['펫'],            
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -327,7 +327,7 @@ class SelectPrimaryBackgroundView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary='( 7 )',
+        operation_summary='( 7 ) - Closet',
         tags=['펫'],            
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -364,7 +364,7 @@ class SelectPrimaryPetView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary='( 5 )',
+        operation_summary='( 5 ) - Closet',
         tags=['펫'],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -399,7 +399,7 @@ class LookUpPetView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary='( 11 )',
+        operation_summary='( 11 ) - Guest',
         tags=['펫'],
     )
     def get(self, request, user_id):
