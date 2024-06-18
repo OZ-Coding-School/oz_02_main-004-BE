@@ -216,7 +216,7 @@ class ToDoView(APIView):
         Retrieve the to-do items for a specific post.
         """
         post = self.get_post(post_id)
-        todos = post.items.all()
+        todos = post.items.all().order_by("created_at")  # ascending order
         serializer = ToDoSerializer(todos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
