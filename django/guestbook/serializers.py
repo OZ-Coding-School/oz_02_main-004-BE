@@ -25,3 +25,12 @@ class GuestBookIdUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'nickname']
+
+
+class GuestBookCommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GuestBookComment
+        fields = ['content', 'guestbook']
+
+    def create(self, validated_data):
+        return GuestBookComment.objects.create(**validated_data)
