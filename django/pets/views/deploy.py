@@ -30,39 +30,27 @@ class MyPetView(APIView):
             serializer = PetMainSerializer(pet)
             return Response(serializer.data)
         except Pet.DoesNotExist:
-            return Response(
-                {"error": "Pet not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({'error': 'Pet not found'}, status=status.HTTP_404_NOT_FOUND)
 
 class FeedRiceView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary='( 4 ) - MainPage',
-        tags=['펫'],
-    )
+    @swagger_auto_schema(operation_summary='( 4 ) - MainPage', tags=['펫'],)
     def post(self, request):
         pet = get_object_or_404(Pet, user=request.user)
-        snack_type = get_object_or_404(SnackType, name="rice")
+        snack_type = get_object_or_404(SnackType, name='rice')
 
         # Find the snack instance for the pet and the given snack type
         snack = Snack.objects.filter(pet=pet, snack_type=snack_type).first()
 
         if not snack:
-            return Response(
-                {"error": "No rice available for this pet."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response({'error': 'No rice available for this pet.'}, status=status.HTTP_400_BAD_REQUEST,)
 
-        quantity = request.data.get(
-            "quantity", 1
-        )  # Default to 1 if quantity is not provided
+        quantity = request.data.get('quantity', 1)  # Default to 1 if quantity is not provided
 
         # Check if there's enough rice
         if quantity > snack.quantity:
-            return Response(
-                {"error": "Not enough rice."}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({'error': 'Not enough rice.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Decrease rice quantity
         snack.quantity -= quantity
@@ -79,20 +67,18 @@ class FeedRiceView(APIView):
         while pet.point >= pet.pet_rating.point:
             pet.point -= pet.pet_rating.point
             next_level = pet.pet_rating.level + 1
-            max_level = PetRating.objects.aggregate(max_level=Max("level"))["max_level"]
+            max_level = PetRating.objects.aggregate(max_level=Max('level'))['max_level']
 
             if next_level > max_level:
-                # Set pet back to level 1 and change active pet to "수상한 알"
+                # Set pet back to level 1 and change active pet to '수상한 알'
                 pet.pet_rating = PetRating.objects.get(level=1)
-                suspicious_egg = get_object_or_404(PetCollection, pet_name="수상한 알")
+                suspicious_egg = get_object_or_404(PetCollection, pet_name='수상한 알')
                 pet.active_pet = suspicious_egg
             else:
                 # Get or create the closet for the pet
                 closet, created = Closet.objects.get_or_create(pet=pet)
                 if created:
-                    suspicious_egg = get_object_or_404(
-                        PetCollection, pet_name="수상한 알"
-                    )
+                    suspicious_egg = get_object_or_404(PetCollection, pet_name='수상한 알')
                     closet.pet_collections.add(suspicious_egg)
 
                 # Add a random pet to the closet when leveling up
@@ -107,10 +93,7 @@ class FeedRiceView(APIView):
                         pet.active_pet = random_pet
                 else:
                     if next_level == 2:
-                        return Response(
-                            {"message": "모든종류의 펫을모았습니다."},
-                            status=status.HTTP_200_OK,
-                        )
+                        return Response({'message': '모든종류의 펫을모았습니다.'}, status=status.HTTP_200_OK,)
 
                 pet.pet_rating = PetRating.objects.get(level=next_level)
 
@@ -120,41 +103,27 @@ class FeedRiceView(APIView):
         snack_serializer = SnackSerializer(snack)
         pet_serializer = PetSerializer(pet)
 
-        return Response(
-            {"snack": snack_serializer.data, "pet": pet_serializer.data},
-            status=status.HTTP_201_CREATED,
-        )
-
+        return Response({'snack': snack_serializer.data, 'pet': pet_serializer.data}, status=status.HTTP_201_CREATED,)
 
 class FeedSnackView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary='( 3 ) - MainPage',
-        tags=['펫'],
-    )
+    @swagger_auto_schema(operation_summary='( 3 ) - MainPage', tags=['펫'],)
     def post(self, request):
         pet = get_object_or_404(Pet, user=request.user)
-        snack_type = get_object_or_404(SnackType, name="snack")
+        snack_type = get_object_or_404(SnackType, name='snack')
 
         # Find the snack instance for the pet and the given snack type
         snack = Snack.objects.filter(pet=pet, snack_type=snack_type).first()
 
         if not snack:
-            return Response(
-                {"error": "No snacks available for this pet."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response({'error': 'No snacks available for this pet.'}, status=status.HTTP_400_BAD_REQUEST,)
 
-        quantity = request.data.get(
-            "quantity", 1
-        )  # Default to 1 if quantity is not provided
+        quantity = request.data.get('quantity', 1)  # Default to 1 if quantity is not provided
 
         # Check if there's enough snack
         if quantity > snack.quantity:
-            return Response(
-                {"error": "Not enough snacks."}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({'error': 'Not enough snacks.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Decrease snack quantity
         snack.quantity -= quantity
@@ -171,20 +140,18 @@ class FeedSnackView(APIView):
         while pet.point >= pet.pet_rating.point:
             pet.point -= pet.pet_rating.point
             next_level = pet.pet_rating.level + 1
-            max_level = PetRating.objects.aggregate(max_level=Max("level"))["max_level"]
+            max_level = PetRating.objects.aggregate(max_level=Max('level'))['max_level']
 
             if next_level > max_level:
-                # Set pet back to level 1 and change active pet to "수상한 알"
+                # Set pet back to level 1 and change active pet to '수상한 알'
                 pet.pet_rating = PetRating.objects.get(level=1)
-                suspicious_egg = get_object_or_404(PetCollection, pet_name="수상한 알")
+                suspicious_egg = get_object_or_404(PetCollection, pet_name='수상한 알')
                 pet.active_pet = suspicious_egg
             else:
                 # Get or create the closet for the pet
                 closet, created = Closet.objects.get_or_create(pet=pet)
                 if created:
-                    suspicious_egg = get_object_or_404(
-                        PetCollection, pet_name="수상한 알"
-                    )
+                    suspicious_egg = get_object_or_404(PetCollection, pet_name='수상한 알')
                     closet.pet_collections.add(suspicious_egg)
 
                 # Add a random pet to the closet when leveling up
@@ -199,10 +166,7 @@ class FeedSnackView(APIView):
                         pet.active_pet = random_pet
                 else:
                     if next_level == 2:
-                        return Response(
-                            {"message": "모든종류의 펫을모았습니다."},
-                            status=status.HTTP_200_OK,
-                        )
+                        return Response({'message': '모든종류의 펫을모았습니다.'}, status=status.HTTP_200_OK,)
 
                 pet.pet_rating = PetRating.objects.get(level=next_level)
 
@@ -212,11 +176,7 @@ class FeedSnackView(APIView):
         snack_serializer = SnackSerializer(snack)
         pet_serializer = PetSerializer(pet)
 
-        return Response(
-            {"snack": snack_serializer.data, "pet": pet_serializer.data},
-            status=status.HTTP_201_CREATED,
-        )
-
+        return Response({'snack': snack_serializer.data, 'pet': pet_serializer.data}, status=status.HTTP_201_CREATED,)
 
 class OpenRandomBoxView(APIView):
     permission_classes = [IsAuthenticated]
@@ -224,35 +184,19 @@ class OpenRandomBoxView(APIView):
     def get_pet(self, request_user):
         return get_object_or_404(Pet, user=request_user)
     
-    @swagger_auto_schema(
-        operation_summary='( 2 ) - RandomBox',
-        tags=['펫'],
-    )
+    @swagger_auto_schema(operation_summary='( 2 ) - RandomBox', tags=['펫'],)
     def post(self, request):
         pet = self.get_pet(request.user)
         try:
             output_item = pet.open_random_boxes()
-            return Response(
-                {
-                    "message": "Random box opened successfully",
-                    "random_boxes": pet.random_boxes,
-                    "output_item": output_item,
-                },
-                status=status.HTTP_200_OK,
-            )
+            return Response({'message': 'Random box opened successfully', 'random_boxes': pet.random_boxes, 'output_item': output_item,}, status=status.HTTP_200_OK,)
         except ValueError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return Response(
-                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ClosetAccessoriesView(APIView):
-    @swagger_auto_schema(
-        operation_summary='( 8 ) - Closet',
-        tags=['펫'],
-    )
+    @swagger_auto_schema(operation_summary='( 8 ) - Closet', tags=['펫'],)
     def get(self, request):
         pet = get_object_or_404(Pet, user=request.user)
         closet = get_object_or_404(Closet, pet=pet)
@@ -277,11 +221,9 @@ class ClosetAccessoriesView(APIView):
 
         return Response(response_data, status=status.HTTP_200_OK)
 
+
 class ClosetBackgroundsView(APIView):
-    @swagger_auto_schema(
-        operation_summary='( 9 ) - Closet',
-        tags=['펫'],
-    )
+    @swagger_auto_schema(operation_summary='( 9 ) - Closet', tags=['펫'],)
     def get(self, request):
         user_pet = get_object_or_404(Pet, user=request.user)
         closet = get_object_or_404(Closet, pet=user_pet)
@@ -306,11 +248,9 @@ class ClosetBackgroundsView(APIView):
 
         return Response(response_data, status=status.HTTP_200_OK)
 
+
 class ClosetPetsView(APIView):
-    @swagger_auto_schema(
-        operation_summary='( 10 ) - Closet',
-        tags=['펫'],
-    )
+    @swagger_auto_schema(operation_summary='( 10 ) - Closet', tags=['펫'],)
     def get(self, request):
         pet = get_object_or_404(Pet, user=request.user)
         closet = get_object_or_404(Closet, pet=pet)
@@ -336,7 +276,6 @@ class ClosetPetsView(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-
 class SelectPrimaryAccessoryView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -345,33 +284,22 @@ class SelectPrimaryAccessoryView(APIView):
         tags=['펫'],            
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            properties={
-                "item_name": openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description="선택하는 아이템 이름",
-                ),
-            },
+            properties={'item_name': openapi.Schema(type=openapi.TYPE_STRING, description='선택하는 아이템 이름',),},
         ),
     )
     def post(self, request):
         pet = get_object_or_404(Pet, user=request.user)
-        item_name = request.data.get("item_name")
+        item_name = request.data.get('item_name')
         accessory = get_object_or_404(Accessory, item_name=item_name)
 
         closet = pet.closets.first()
         if accessory not in closet.accessories.all():
-            return Response(
-                {"error": "Accessory not in closet"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({'error': 'Accessory not in closet'}, status=status.HTTP_400_BAD_REQUEST)
 
         pet.primary_accessory = accessory
         pet.save()
 
-        return Response(
-            {"message": "Primary accessory selected successfully"},
-            status=status.HTTP_200_OK,
-        )
-
+        return Response({'message': 'Primary accessory selected successfully'}, status=status.HTTP_200_OK,)
 
 class SelectPrimaryBackgroundView(APIView):
     permission_classes = [IsAuthenticated]
@@ -381,34 +309,22 @@ class SelectPrimaryBackgroundView(APIView):
         tags=['펫'],            
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            properties={
-                "item_name": openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description="선택하는 아이템 이름",
-                ),
-            },
+            properties={'item_name': openapi.Schema(type=openapi.TYPE_STRING, description='선택하는 아이템 이름',),},
         ),
     )
     def post(self, request, pet_id):
         pet = get_object_or_404(Pet, user=request.user)
-        item_name = request.data.get("item_name")
+        item_name = request.data.get('item_name')
         background = get_object_or_404(Background, item_name=item_name)
 
         closet = pet.closets.first()
         if background not in closet.backgrounds.all():
-            return Response(
-                {"error": "Background not in closet"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response({'error': 'Background not in closet'}, status=status.HTTP_400_BAD_REQUEST,)
 
         pet.primary_background = background
         pet.save()
 
-        return Response(
-            {"message": "Primary background selected successfully"},
-            status=status.HTTP_200_OK,
-        )
-
+        return Response({'message': 'Primary background selected successfully'}, status=status.HTTP_200_OK,)
 
 class SelectPrimaryPetView(APIView):
     permission_classes = [IsAuthenticated]
@@ -418,46 +334,31 @@ class SelectPrimaryPetView(APIView):
         tags=['펫'],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            properties={
-                "item_name": openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description="선택하는 펫 이름",
-                ),
-            },
+            properties={'item_name': openapi.Schema(type=openapi.TYPE_STRING, description='선택하는 펫 이름',),},
         ),
     )
     def post(self, request):
         pet = get_object_or_404(Pet, user=request.user)
-        item_name = request.data.get("item_name")
+        item_name = request.data.get('item_name')
         selected_pet = get_object_or_404(PetCollection, pet_name=item_name)
 
         closet = pet.closets.first()
         if selected_pet not in closet.pet_collections.all():
-            return Response(
-                {"error": "Pet not in closet"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({'error': 'Pet not in closet'}, status=status.HTTP_400_BAD_REQUEST)
 
         pet.primary_pet = selected_pet
         pet.save()
 
-        return Response(
-            {"message": "Primary pet selected successfully"}, status=status.HTTP_200_OK
-        )
-
+        return Response({'message': 'Primary pet selected successfully'}, status=status.HTTP_200_OK)
 
 class LookUpPetView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary='( 11 ) - Guest',
-        tags=['펫'],
-    )
+    @swagger_auto_schema(operation_summary='( 11 ) - Guest', tags=['펫'],)
     def get(self, request, user_id):
         try:
             pet = Pet.objects.get(user_id=user_id)
             serializer = LoopUpPetSerializer(pet)
             return Response(serializer.data)
         except Pet.DoesNotExist:
-            return Response(
-                {"error": "Pet not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({'error': 'Pet not found'}, status=status.HTTP_404_NOT_FOUND)

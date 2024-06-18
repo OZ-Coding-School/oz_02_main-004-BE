@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from ..models import GuestBook, GuestBookComment
-from ..serializers import GuestBookCommentSerializer, GuestBookIdUserSerializer
+from ..serializers import GuestBookCommentSerializer
 from django.http import Http404
 from users.models import User
 from drf_yasg.utils import swagger_auto_schema
@@ -30,8 +30,6 @@ class GuestBookTestView(APIView):
         comments = GuestBookComment.objects.filter(guestbook_id=gb.id)
         serializer = GuestBookCommentSerializer(comments, many=True)
         return Response(serializer.data)
-
-
 
 class GuestBookCommentTestView(APIView):
     @swagger_auto_schema(
@@ -74,8 +72,6 @@ class GuestBookCommentTestView(APIView):
             # serializer.save(user=request.user, guestbook=guestbook)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 class GuestBookCommentUpdateTestView(APIView):
     # permission_classes = [IsAuthenticated]
