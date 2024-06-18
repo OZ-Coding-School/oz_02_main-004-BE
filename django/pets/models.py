@@ -63,15 +63,15 @@ class Pet(CommonModel):
 
     def open_random_boxes(self):
         if self.random_boxes == 0:
-            raise ValueError('No random boxes available')
+            raise ValueError("No random boxes available")
 
         accessories = list(Accessory.objects.all())
         backgrounds = list(Background.objects.all())
-        snacks = list(SnackType.objects.filter(name='snack'))
+        snacks = list(SnackType.objects.filter(name="snack"))
         items = accessories + backgrounds + snacks
 
         if not items:
-            raise ValueError('No accesstory and background object available')
+            raise ValueError("No accessory and background object available")
 
         randomly_chosen_item = random.choice(items)
 
@@ -79,10 +79,17 @@ class Pet(CommonModel):
 
         if isinstance(randomly_chosen_item, SnackType):
             # create or get snack instance
-            snack, created = Snack.objects.get_or_create(pet=self, snack_type=randomly_chosen_item)
+            snack, created = Snack.objects.get_or_create(
+                pet=self, snack_type=randomly_chosen_item
+            )
             snack.quantity += 1
             snack.save()
-            output_item = {'type': 'snack', 'name': snack.snack_type.name, 'quantity': snack.quantity}
+            output_item = {
+                'type': 'snack',
+                'name': snack.snack_type.name,
+                'quantity': snack.quantity,
+                'image': snack.snack_type.image.url if snack.snack_type.image else ""
+            }
         else:
             # create or get closet instance
             closet, created = Closet.objects.get_or_create(pet=self)
@@ -90,15 +97,25 @@ class Pet(CommonModel):
             # check if the chosen item is an instance of Accessory
             if isinstance(randomly_chosen_item, Accessory):
                 closet.accessories.add(randomly_chosen_item)
-                output_item = {'type': 'accessory', 'name': randomly_chosen_item.item_name}
+                output_item = {
+                    'type': 'accessory',
+                    'name': randomly_chosen_item.item_name,
+                    'image': randomly_chosen_item.image.url if randomly_chosen_item.image else ""
+                }
             elif isinstance(randomly_chosen_item, Background):
                 closet.backgrounds.add(randomly_chosen_item)
-                output_item = {'type': 'background', 'name': randomly_chosen_item.item_name}
+                output_item = {
+                    'type': 'background',
+                    'name': randomly_chosen_item.item_name,
+                    'image': randomly_chosen_item.image.url if randomly_chosen_item.image else ""
+                }
 
         # update random_boxes
         self.random_boxes -= 1
         self.save()
+
         return output_item
+
 
     def __str__(self):
         return f'{self.user.email}의 펫'
@@ -122,6 +139,7 @@ class SnackType(CommonModel):
 
     name = models.CharField(max_length=10, choices=SNACK_TYPES, verbose_name='이름')
     experience_points = models.IntegerField(verbose_name='경험치', default=0)
+    image = models.ImageField(upload_to='snacktypes/', verbose_name='음식 이미지', null=True, blank=True)
 
     def __str__(self):
         return f'{self.name} - {self.experience_points}'

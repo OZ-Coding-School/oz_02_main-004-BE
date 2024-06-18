@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from ..models import GuestBook, GuestBookComment
-from ..serializers import GuestBookCommentSerializer, GuestBookIdUserSerializer
+from ..serializers import *
 from django.http import Http404
 from users.models import User
 from drf_yasg.utils import swagger_auto_schema
@@ -74,16 +74,29 @@ class GuestBookCommentCreateView(APIView):
         tags=['방명록'],
     )
     def post(self, request):
-        user_email = User.objects.get(id=request.user.id)
-        guestbook = GuestBook.objects.get(user=request.data['guestbook_user'])
-        request.data['guestbook'] = guestbook.id
-        request.data['user'] = request.user.id
-        serializer = GuestBookCommentSerializer(data=request.data)
+        guestbook_user_id = request.data.get('guestbook_user')
+        content = request.data.get('content')
+
+        if not guestbook_user_id or not content:
+            return Response({"error": "guestbook_user and content are required fields."}, status=status.HTTP_400_BAD_REQUEST)
+
+        guestbook_user = get_object_or_404(User, id=guestbook_user_id)
+        guestbook = get_object_or_404(GuestBook, user=guestbook_user)
+
+        data = {
+            'content': content,
+            'guestbook': guestbook.id,
+            'user': request.user.id
+        }
+
+        serializer = GuestBookCommentSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(user=user_email)
-            # serializer.save(user=request.user, guestbook=guestbook)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 class GuestBookCommentUpdateView(APIView):
     permission_classes = [IsAuthenticated]

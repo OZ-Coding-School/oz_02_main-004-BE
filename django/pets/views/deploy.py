@@ -191,7 +191,10 @@ class OpenRandomBoxView(APIView):
             output_item = pet.open_random_boxes()
             return Response({'message': 'Random box opened successfully', 'random_boxes': pet.random_boxes, 'output_item': output_item,}, status=status.HTTP_200_OK,)
         except ValueError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            if str(e) == "No random boxes available":
+                return Response({"message": "랜덤박스가 없습니다."}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -312,7 +315,7 @@ class SelectPrimaryBackgroundView(APIView):
             properties={'item_name': openapi.Schema(type=openapi.TYPE_STRING, description='선택하는 아이템 이름',),},
         ),
     )
-    def post(self, request, pet_id):
+    def post(self, request):
         pet = get_object_or_404(Pet, user=request.user)
         item_name = request.data.get('item_name')
         background = get_object_or_404(Background, item_name=item_name)
