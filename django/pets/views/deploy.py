@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from pets.models import Pet, SnackType, Snack, PetRating, Closet, PetCollection
+from pets.models import *
 from ..serializers import *
 from rest_framework import status
 from django.db.models import Max
@@ -200,27 +200,81 @@ class ClosetAccessoriesView(APIView):
     def get(self, request):
         pet = get_object_or_404(Pet, user=request.user)
         closet = get_object_or_404(Closet, pet=pet)
-        accessories = closet.accessories.all()
-        serializer = AccessorySerializer(accessories, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        all_accessories = Accessory.objects.all()
+        closet_accessories = closet.accessories.all()
+
+        closet_accessories_names = { accessory.item_name for accessory in closet_accessories }
+
+        response_data = []
+
+        for accessory in all_accessories:
+            if accessory.item_name in closet_accessories_names:
+                response_data.append({
+                    "item": accessory.item_name,
+                    "image": accessory.image.url if accessory.image else ""
+                })
+            else:
+                response_data.append({
+                    "item": "???",
+                    "image": ""
+                })
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
 
 class ClosetBackgroundsView(APIView):
     @swagger_auto_schema(operation_summary='( 9 ) - Closet', tags=['펫'],)
     def get(self, request):
-        pet = get_object_or_404(Pet, user=request.user)
-        closet = get_object_or_404(Closet, pet=pet)
-        backgrounds = closet.backgrounds.all()
-        serializer = BackgroundSerializer(backgrounds, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        user_pet = get_object_or_404(Pet, user=request.user)
+        closet = get_object_or_404(Closet, pet=user_pet)
+        all_backgrounds = Background.objects.all()
+        closet_backgrounds = closet.backgrounds.all()
+
+        closet_backgrounds_names = { background.item_name for background in closet_backgrounds }
+
+        response_data = []
+
+        for background in all_backgrounds:
+            if background.item_name in closet_backgrounds_names:
+                response_data.append({
+                    "item": background.item_name,
+                    "image": background.image.url if background.image else ""
+                })
+            else:
+                response_data.append({
+                    "item": "???",
+                    "image": ""
+                })
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
 
 class ClosetPetsView(APIView):
     @swagger_auto_schema(operation_summary='( 10 ) - Closet', tags=['펫'],)
     def get(self, request):
         pet = get_object_or_404(Pet, user=request.user)
         closet = get_object_or_404(Closet, pet=pet)
-        pets = closet.pet_collections.all()
-        serializer = PetCollectionSerializer(pets, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        all_pets = PetCollection.objects.all()
+        closet_pets = closet.pet_collections.all()
+
+        closet_pet_names = {pet.pet_name for pet in closet_pets}
+        
+        response_data = []
+
+        for pet in all_pets:
+            if pet.pet_name in closet_pet_names:
+                response_data.append({
+                    "item": pet.pet_name,
+                    "image": pet.image.url if pet.image else ""
+                })
+            else:
+                response_data.append({
+                    "item": "???",
+                    "image": ""
+                })
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
 
 class SelectPrimaryAccessoryView(APIView):
     permission_classes = [IsAuthenticated]
