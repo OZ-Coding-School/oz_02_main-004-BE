@@ -1,8 +1,6 @@
 from rest_framework import serializers
-from guestbook.models import GuestBookComment, GuestBook
+from guestbook.models import GuestBookComment
 from users.models import User
-
-
 
 class GuestBookCommentSerializer(serializers.ModelSerializer):
     user_nickname = serializers.SerializerMethodField()
