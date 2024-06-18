@@ -192,7 +192,7 @@ class OpenRandomBoxView(APIView):
             return Response({'message': 'Random box opened successfully', 'random_boxes': pet.random_boxes, 'output_item': output_item,}, status=status.HTTP_200_OK,)
         except ValueError as e:
             if str(e) == "No random boxes available":
-                return Response({"message": "랜덤박스가 없습니다."}, status=status.HTTP_204_NO_CONTENT)
+                return Response({'message': '랜덤박스가 없습니다.',}, status=status.HTTP_200_OK,)
             else:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
