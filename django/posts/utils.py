@@ -32,7 +32,7 @@ def get_consecutive_success_days(user) -> int:
 
     # whenever five consecutive sucess days
     pet = user.pet
-    previous_streak = getattr(pet, "streak", 0)
+    previous_streak = getattr(pet, 'streak', 0)
 
     if streak != previous_streak:
         if streak % 5 == 0:
@@ -40,5 +40,5 @@ def get_consecutive_success_days(user) -> int:
         pet.streak = streak
         pet.save()
 
-    print(f"연속 목표 달성(days) : {streak}일")
+    print(f'연속 목표 달성(days) : {streak}일')
     return streak

@@ -54,71 +54,57 @@ class PetRating(CommonModel):
 
 # Pet model
 class Pet(CommonModel):
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="pet", verbose_name="사용자 ID"
-    )
-    point = models.IntegerField(verbose_name="경험치", default=0)
-    hunger_degree = models.DateTimeField(
-        auto_now_add=True, verbose_name="최근 식사 시간"
-    )  # 최근 밥이나 간식 준 시간
-    random_boxes = models.PositiveIntegerField(verbose_name="랜덤 박스 갯수", default=0)
-    pet_rating = models.ForeignKey(
-        PetRating,
-        on_delete=models.CASCADE,
-        related_name="pets",
-        verbose_name="레이팅 ID",
-    )
-    primary_accessory = models.ForeignKey(
-        Accessory,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="primary_accessory_pets",
-        verbose_name="대표 악세사리 아이템",
-    )
-    primary_background = models.ForeignKey(
-        Background,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="primary_background_pets",
-        verbose_name="대표 배경 아이템",
-    )
-    primary_pet = models.ForeignKey(
-        PetCollection,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="primary_pet_pets",
-        verbose_name="대표 펫 아이템",
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='pet', verbose_name='사용자 ID')
+    point = models.IntegerField(verbose_name='경험치', default=0)
+    hunger_degree = models.DateTimeField(null=True, blank=True, verbose_name='최근 식사 시간')  # 최근 밥이나 간식 준 시간
+    random_boxes = models.PositiveIntegerField(verbose_name='랜덤 박스 갯수', default=0)
+    pet_rating = models.ForeignKey(PetRating, on_delete=models.CASCADE, related_name='pets', verbose_name='레이팅 ID',)
+    primary_accessory = models.ForeignKey(Accessory, null=True, blank=True, on_delete=models.SET_NULL, related_name='primary_accessory_pets', verbose_name='대표 악세사리 아이템',)
+    primary_background = models.ForeignKey(Background, null=True, blank=True, on_delete=models.SET_NULL, related_name='primary_background_pets', verbose_name='대표 배경 아이템',)
+    primary_pet = models.ForeignKey(PetCollection, null=True, blank=True, on_delete=models.SET_NULL, related_name='primary_pet_pets', verbose_name='대표 펫 아이템',)
+    active_pet = models.ForeignKey(PetCollection, null=True, blank=True, on_delete=models.SET_NULL, related_name='active_pet_pets', verbose_name='키우는 펫 아이템',)
     streak = models.PositiveIntegerField(default=0)
+    last_snack_date = models.DateField(null=True, blank=True, verbose_name='최근 간식(밥) 날짜')
 
     def open_random_boxes(self):
         if self.random_boxes == 0:
-            raise ValueError("No random boxes available")
+            raise ValueError('No random boxes available')
 
         accessories = list(Accessory.objects.all())
         backgrounds = list(Background.objects.all())
-        items = accessories + backgrounds
+        snacks = list(SnackType.objects.filter(name='snack'))
+        items = accessories + backgrounds + snacks
 
         if not items:
-            raise ValueError("No accesstory and background object available")
+            raise ValueError('No accesstory and background object available')
 
         randomly_chosen_item = random.choice(items)
 
-        # create or get closet instance
-        closet, created = Closet.objects.get_or_create(pet=self)
+        output_item = None
 
-        # check if the chosen item is an instance of Accessory
-        if isinstance(randomly_chosen_item, Accessory):
-            closet.accessories.add(randomly_chosen_item)
-        elif isinstance(randomly_chosen_item, Background):
-            closet.backgrounds.add(randomly_chosen_item)
+        if isinstance(randomly_chosen_item, SnackType):
+            # create or get snack instance
+            snack, created = Snack.objects.get_or_create(pet=self, snack_type=randomly_chosen_item)
+            snack.quantity += 1
+            snack.save()
+            output_item = {'type': 'snack', 'name': snack.snack_type.name, 'quantity': snack.quantity}
+        else:
+            # create or get closet instance
+            closet, created = Closet.objects.get_or_create(pet=self)
+
+            # check if the chosen item is an instance of Accessory
+            if isinstance(randomly_chosen_item, Accessory):
+                closet.accessories.add(randomly_chosen_item)
+                output_item = {'type': 'accessory', 'name': randomly_chosen_item.item_name}
+            elif isinstance(randomly_chosen_item, Background):
+                closet.backgrounds.add(randomly_chosen_item)
+                output_item = {'type': 'background', 'name': randomly_chosen_item.item_name}
 
         # update random_boxes
         self.random_boxes -= 1
         self.save()
+
+        return output_item
 
     def __str__(self):
         return f"{self.user.email}의 펫"
@@ -146,8 +132,8 @@ class Closet(CommonModel):
 # SnackType model
 class SnackType(CommonModel):
     SNACK_TYPES = (
-        ("rice", "밥"),  # ('DB에 저장될 값', '사용자에게 보여질 값')
-        ("snack", "간식"),
+        ('rice', '밥'),  # ('DB에 저장될 값', '사용자에게 보여질 값')
+        ('snack', '간식'),
     )
 
     name = models.CharField(max_length=10, choices=SNACK_TYPES, verbose_name="이름")
@@ -159,12 +145,10 @@ class SnackType(CommonModel):
 
 # Snack model
 class Snack(CommonModel):
-    pet = models.ForeignKey(
-        Pet, on_delete=models.CASCADE, related_name="snacks", verbose_name="펫 ID"
-    )
-    snack_type = models.ForeignKey(
-        SnackType, on_delete=models.CASCADE, related_name="snacks", verbose_name="종류"
-    )  # 밥, 간식 구분
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='snacks', verbose_name='펫 ID')
+    snack_type = models.ForeignKey(SnackType, on_delete=models.CASCADE, related_name='snacks', verbose_name='종류')  # 밥, 간식 구분
+    quantity = models.IntegerField(verbose_name='개수', default=0)
 
     def __str__(self):
-        return f"{self.pet.user.email}의 {self.snack_type.name}"
+        return f'{self.pet.user.email}의 {self.snack_type.name} ({self.quantity}개)'
+

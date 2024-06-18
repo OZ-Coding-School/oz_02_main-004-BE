@@ -77,6 +77,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 
+
 if platform_index == 'Linux':
     DATABASES = {
         'default': {
@@ -95,6 +96,20 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+    # import configparser
+    # CONF = configparser.ConfigParser()
+    # CONF.read("config.ini")
+    # DATABASES = {
+    #     "default": {
+    #         "ENGINE": "django.db.backends.mysql",
+    #         "NAME": CONF["mysql"]["DB_NAME"],
+    #         "USER": CONF["mysql"]["DB_USER"],
+    #         "PASSWORD": CONF["mysql"]["DB_PASS"],
+    #         "HOST": CONF["mysql"]["DB_HOST"],
+    #         "PORT": CONF["mysql"]["DB_PORT"],
+    #     }
+    # }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
