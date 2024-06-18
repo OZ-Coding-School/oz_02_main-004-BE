@@ -365,3 +365,7 @@ class LookUpPetView(APIView):
             return Response(serializer.data)
         except Pet.DoesNotExist:
             return Response({'error': 'Pet not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+

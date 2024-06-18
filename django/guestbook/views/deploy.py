@@ -97,7 +97,6 @@ class GuestBookCommentCreateView(APIView):
 
 
 
-
 class GuestBookCommentUpdateView(APIView):
     permission_classes = [IsAuthenticated]
 
