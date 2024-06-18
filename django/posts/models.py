@@ -12,7 +12,7 @@ from django.dispatch import receiver
 
 
 class UserGoal(CommonModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="goal")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='goal')
     goal = models.CharField(max_length=255, blank=True, null=True)
     d_day = models.DateField(null=True, blank=True)
 
@@ -36,7 +36,7 @@ class UserGoal(CommonModel):
 
 class Post(CommonModel):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     feeling_status = models.PositiveSmallIntegerField(null=True, blank=True)
     todo_progress = models.PositiveIntegerField(default=0)
     todo_date = models.DateField(default=timezone.now)
@@ -47,14 +47,14 @@ class Post(CommonModel):
     d_day = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return f"ID: {self.id}, date: {self.todo_date}"
+        return f'ID: {self.id}, date: {self.todo_date}'
 
     def update_progress(self):
         num_items = self.items.all().count()
         if num_items:
             num_done = self.items.filter(done=True).count()
             self.todo_progress = int((num_done / num_items) * 100)
-            self.save(update_fields=["todo_progress"])
+            self.save(update_fields=['todo_progress'])
 
             # 80 프로 이상 todo 완료시 하루 한번 펫에게 밥주기
             if self.todo_progress >= 80:
@@ -62,7 +62,7 @@ class Post(CommonModel):
 
         else:
             self.todo_progress = 0
-            self.save(update_fields=["todo_progress"])
+            self.save(update_fields=['todo_progress'])
 
     @property
     def days_by_deadline(self):
@@ -79,13 +79,13 @@ class Post(CommonModel):
     def give_rice_to_pet(self):
         pet = self.user.pet
         if pet.last_snack_date != self.todo_date:
-            snack_type = SnackType.objects.get(name="rice")
+            snack_type = SnackType.objects.get(name='rice')
             snack, created = Snack.objects.get_or_create(pet=pet, snack_type=snack_type)
             snack.quantity += 1
             snack.save()
 
             pet.last_snack_date = self.todo_date
-            pet.save(update_fields=["last_snack_date"])
+            pet.save(update_fields=['last_snack_date'])
 
 
 # new post 객체를 db에 저장하기 전에
@@ -94,7 +94,7 @@ class Post(CommonModel):
 def set_goal_and_d_day(sender, instance, **kwargs):
     # check if the post is being created
     # user_goal: usergoal instance
-    user_goal = getattr(instance.user, "goal", None)
+    user_goal = getattr(instance.user, 'goal', None)
     if user_goal:
         # post instance:  goal field, d-day fields update
         instance.goal = user_goal.goal
@@ -118,24 +118,22 @@ def create_user_goal(sender, instance, created, **kwargs):
 class ToDo(CommonModel):
     todo_item = models.CharField(max_length=255)
     done = models.BooleanField(default=False)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="items")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='items')
 
     def __str__(self):
-        return f"Item : {self.todo_item} Done : {self.done}"
+        return f'Item : {self.todo_item} Done : {self.done}'
 
 
 class Music(CommonModel):
-    singer = models.CharField(max_length=255, default="")
-    album = models.CharField(max_length=255, default="")
+    singer = models.CharField(max_length=255, default='')
+    album = models.CharField(max_length=255, default='')
     title = models.CharField(max_length=255, null=False)
     release_date = models.DateField(blank=True, null=True)
-    song_url = models.CharField(
-        max_length=255, blank=True, null=True, validators=[URLValidator()]
-    )
-    post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name="music")
+    song_url = models.CharField(max_length=255, blank=True, null=True, validators=[URLValidator()])
+    post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name='music')
 
     def __str__(self):
-        return f"Title: {self.title}, POST: {self.post.id}"
+        return f'Title: {self.title}, POST: {self.post.id}'
 
 
 class Timer(CommonModel):
@@ -143,12 +141,10 @@ class Timer(CommonModel):
     start = models.DateTimeField(default=timezone.now)
     end = models.DateTimeField(null=True, blank=True)
     duration = models.DurationField(default=timedelta)
-    post = models.OneToOneField(
-        Post, on_delete=models.CASCADE, related_name="timer", null=True, blank=True
-    )
+    post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name='timer', null=True, blank=True)
 
     def __str__(self):
-        return f"Post: {self.post}, On/off: {self.on_btn}, Duration: {self.duration}"
+        return f'Post: {self.post}, On/off: {self.on_btn}, Duration: {self.duration}'
 
     def pause(self):
         self.on_btn = False
@@ -179,4 +175,4 @@ class Timer(CommonModel):
         total_seconds = int(self.duration.total_seconds())
         hours, remainder = divmod(total_seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
-        return f"{hours:02}:{minutes:02}:{seconds:02}"
+        return f'{hours:02}:{minutes:02}:{seconds:02}'

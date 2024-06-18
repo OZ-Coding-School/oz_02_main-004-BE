@@ -58,8 +58,6 @@ class GuestBookCommentView(APIView):
         serializer = GuestBookCommentSerializer(comments, many=True)
         return Response(serializer.data)
 
-
-
 class GuestBookCommentCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -121,7 +119,7 @@ class GuestBookCommentUpdateView(APIView):
         comment = self.get_object(request.data['comment_id'])
 
         if not self.has_permission_to_update(request.user, comment):
-            return Response({"error": "You do not have permission to update this comment."}, status=status.HTTP_403_FORBIDDEN)
+            return Response({'error': 'You do not have permission to update this comment.'}, status=status.HTTP_403_FORBIDDEN)
 
         data = request.data.copy()
         data['user'] = request.user.id  # Ensure the user is the current logged-in user
@@ -132,7 +130,6 @@ class GuestBookCommentUpdateView(APIView):
             response_data['message'] = '수정완료'
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class GuestBookCommentDeleteView(APIView):
     permission_classes = [IsAuthenticated]
@@ -157,9 +154,7 @@ class GuestBookCommentDeleteView(APIView):
         operation_description='/guestbook/comments/{user_id}/에서 comment_id 조회가능 \n 방명록의 소유자 이거나, 방명록 작성자만 삭제가능.',
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            properties={
-                'comment_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='삭제를 원하는 방명록 게시물 ID',),
-            },
+            properties={'comment_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='삭제를 원하는 방명록 게시물 ID',),},
         ),
         tags=['방명록'],
     )
@@ -167,7 +162,7 @@ class GuestBookCommentDeleteView(APIView):
         comment = self.get_object(request.data['comment_id'])
         
         if not self.has_permission_to_delete(request.user, comment):
-            return Response({"error": "You do not have permission to delete this comment."}, status=status.HTTP_403_FORBIDDEN)
+            return Response({'error': 'You do not have permission to delete this comment.'}, status=status.HTTP_403_FORBIDDEN)
         
         comment.delete()
         return Response({'message': '삭제완료'}, status=status.HTTP_200_OK)

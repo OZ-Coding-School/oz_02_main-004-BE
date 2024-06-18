@@ -2,7 +2,6 @@ from pathlib import Path
 from datetime import timedelta
 import json, platform, os
 
-
 # cicd 머지 test
 
 # 개발환경과 서버환경 구분을 위한 변수

@@ -57,16 +57,18 @@ class PetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pet
         fields = [
-            'user', 'point', 'hunger_degree', 'random_boxes', 'pet_rating',
-            'primary_accessory', 'primary_background', 'primary_pet',
-            'rice_quantity', 'snack_quantity', 'active_pet', 'hunger_degree_status'
+            'user', 'point', 'hunger_degree', 'random_boxes', 'pet_rating', 'primary_accessory',
+            'primary_background', 'primary_pet', 'rice_quantity', 'snack_quantity', 'active_pet', 'hunger_degree_status'
         ]
 
     
 class PetMainSerializer(PetSerializer):
     class Meta:
         model = Pet
-        fields = ['user', 'pet_rating', 'point', 'hunger_degree_status', 'active_pet', 'primary_background', 'random_boxes', 'rice_quantity','snack_quantity']
+        fields = [
+            'user', 'pet_rating', 'point', 'hunger_degree_status', 'active_pet', 'primary_background',
+            'random_boxes', 'rice_quantity','snack_quantity'
+            ]
 
 
 class LoopUpPetSerializer(PetSerializer):
@@ -82,7 +84,6 @@ class LoopUpPetSerializer(PetSerializer):
 
     def get_guestbook_url(self, obj):
         return f'/guestbook/comments/{obj.user.id}/'
-
 
 
 class SnackSerializer(serializers.ModelSerializer):
