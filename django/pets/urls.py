@@ -8,12 +8,8 @@ urlpatterns = [
     path('closet/select-accessory/<int:pet_id>/', SelectPrimaryAccessoryView.as_view(), name='select-primary-accessory'),
     path('closet/select-background/<int:pet_id>/', SelectPrimaryBackgroundView.as_view(), name='select-primary-background'),
     path('closet/select-pet/<int:pet_id>/', SelectPrimaryPetView.as_view(), name='select-primary-pet'),
-    path("mypet/<int:user_id>/", MyPetView.as_view(), name="mypet"),
-    path("feed-rice/<int:pet_id>/", FeedRiceView.as_view(), name="feed-rice"),
-    path("feed-snack/<int:pet_id>/", FeedSnackView.as_view(), name="feed-snack"),
-    path(
-        "open-random-box/<int:user_id>/",
-        OpenRandomBoxView.as_view(),
-        name="open_random_box",
-    ),
+    path('mypet/<int:user_id>/', MyPetView.as_view(), name='mypet'),
+    path('feed-rice/<int:pet_id>/', FeedRiceView.as_view(), name='feed-rice'),
+    path('feed-snack/<int:pet_id>/', FeedSnackView.as_view(), name='feed-snack'),
+    path('open-random-box/<int:user_id>/', OpenRandomBoxView.as_view(), name='open_random_box',),
 ]

@@ -44,26 +44,27 @@ class PetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pet
         fields = [
-            'user', 'point', 'hunger_degree', 'random_boxes', 'pet_rating',
-            'primary_accessory', 'primary_background', 'primary_pet',
-            'rice_quantity', 'snack_quantity', 'active_pet'
+            'user', 'point', 'hunger_degree', 'random_boxes', 'pet_rating', 'primary_accessory',
+            'primary_background', 'primary_pet', 'rice_quantity', 'snack_quantity', 'active_pet'
         ]
 
     
 class PetMainSerializer(PetSerializer):
     class Meta:
         model = Pet
-        fields = ['user', 'point', 'hunger_degree', 'random_boxes', 'pet_rating', 'primary_accessory', 'primary_background', 'rice_quantity','snack_quantity', 'active_pet']
+        fields = [
+            'user', 'point', 'hunger_degree', 'random_boxes', 'pet_rating', 'primary_accessory',
+            'primary_background', 'rice_quantity','snack_quantity', 'active_pet'
+            ]
 
 
 class PetShareSerializer(PetSerializer):
     class Meta:
         model = Pet
-        fields = ['user', 'point', 'hunger_degree', 'random_boxes', 'pet_rating', 'primary_accessory', 'primary_background', 'primary_pet', 'rice_quantity','snack_quantity']
-
-
-
-
+        fields = [
+            'user', 'point', 'hunger_degree', 'random_boxes', 'pet_rating', 'primary_accessory',
+            'primary_background', 'primary_pet', 'rice_quantity','snack_quantity'
+            ]
 
 class SnackSerializer(serializers.ModelSerializer):
     class Meta:
