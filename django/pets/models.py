@@ -60,25 +60,39 @@ class Pet(CommonModel):
     active_pet = models.ForeignKey(PetCollection, null=True, blank=True, on_delete=models.SET_NULL, related_name='active_pet_pets', verbose_name='키우는 펫 아이템',)
     streak = models.PositiveIntegerField(default=0)
     last_snack_date = models.DateField(null=True, blank=True, verbose_name='최근 간식(밥) 날짜')
+# In the Pet model
 
     def open_random_boxes(self):
         if self.random_boxes == 0:
             raise ValueError("No random boxes available")
 
+        # Get all possible items
         accessories = list(Accessory.objects.all())
         backgrounds = list(Background.objects.all())
         snacks = list(SnackType.objects.filter(name="snack"))
-        items = accessories + backgrounds + snacks
 
-        if not items:
-            raise ValueError("No accessory and background object available")
+        # Get the user's current items
+        closet, created = Closet.objects.get_or_create(pet=self)
+        user_accessories = closet.accessories.all()
+        user_backgrounds = closet.backgrounds.all()
 
-        randomly_chosen_item = random.choice(items)
+        # Determine which items the user does not have
+        available_accessories = [item for item in accessories if item not in user_accessories]
+        available_backgrounds = [item for item in backgrounds if item not in user_backgrounds]
+
+        # Combine available items, ensuring no duplicates
+        available_items = available_accessories + available_backgrounds + snacks
+
+        # If the user has all accessories and backgrounds, only provide snacks
+        if not available_accessories and not available_backgrounds:
+            available_items = snacks
+
+        randomly_chosen_item = random.choice(available_items)
 
         output_item = None
 
         if isinstance(randomly_chosen_item, SnackType):
-            # create or get snack instance
+            # Create or get snack instance
             snack, created = Snack.objects.get_or_create(
                 pet=self, snack_type=randomly_chosen_item
             )
@@ -91,10 +105,7 @@ class Pet(CommonModel):
                 'image': snack.snack_type.image.url if snack.snack_type.image else ""
             }
         else:
-            # create or get closet instance
-            closet, created = Closet.objects.get_or_create(pet=self)
-
-            # check if the chosen item is an instance of Accessory
+            # Add the chosen item to the user's closet
             if isinstance(randomly_chosen_item, Accessory):
                 closet.accessories.add(randomly_chosen_item)
                 output_item = {
@@ -110,7 +121,7 @@ class Pet(CommonModel):
                     'image': randomly_chosen_item.image.url if randomly_chosen_item.image else ""
                 }
 
-        # update random_boxes
+        # Update random_boxes
         self.random_boxes -= 1
         self.save()
 
