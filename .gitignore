@@ -14,7 +14,8 @@ db.sqlite3
 # But don't ignore the __init__.py file
 !**/migrations/__init__.py
 
-
+# vscode settings #
+.vscode
 
 # Backup files # 
 *.bak 
