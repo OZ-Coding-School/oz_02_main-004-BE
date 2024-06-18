@@ -174,3 +174,9 @@ class Timer(CommonModel):
             self.duration += self.end - self.start
         else:
             self.duration += timezone.now() - self.start
+
+    def format_duration(self):
+        total_seconds = int(self.duration.total_seconds())
+        hours, remainder = divmod(total_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f"{hours:02}:{minutes:02}:{seconds:02}"
