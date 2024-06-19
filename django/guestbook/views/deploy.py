@@ -11,8 +11,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 class GuestBookViewdetail(APIView):
-    # permission_classes = [IsAuthenticated]
-
+    
     # api/v1/guestbook/<str:nickname>/
     @swagger_auto_schema(
         operation_summary='유저의 닉네임으로 유저 ID 검색',
@@ -78,23 +77,18 @@ class GuestBookCommentCreateView(APIView):
         content = request.data.get('content')
 
         if not guestbook_user_id or not content:
-            return Response({"error": "guestbook_user and content are required fields."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'guestbook_user and content are required fields.'}, status=status.HTTP_400_BAD_REQUEST)
 
         guestbook_user = get_object_or_404(User, id=guestbook_user_id)
         guestbook = get_object_or_404(GuestBook, user=guestbook_user)
 
-        data = {
-            'content': content,
-            'guestbook': guestbook.id,
-            'user': request.user.id
-        }
+        data = {'content': content, 'guestbook': guestbook.id, 'user': request.user.id}
 
         serializer = GuestBookCommentSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class GuestBookCommentUpdateView(APIView):

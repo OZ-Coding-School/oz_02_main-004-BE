@@ -21,7 +21,7 @@ class MyPetView(APIView):
             serializer = PetSerializer(pet)
             return Response(serializer.data)
         except Pet.DoesNotExist:
-            return Response({"error": "Pet not found"}, status=404)
+            return Response({'error': 'Pet not found'}, status=404)
 
 
 class OpenRandomBoxView(APIView):
@@ -38,16 +38,8 @@ class OpenRandomBoxView(APIView):
         pet = self.get_pet(user_id)
         try:
             pet.open_random_boxes()
-            return Response(
-                {
-                    "message": "Random box opened successfully",
-                    "random_boxes": pet.random_boxes,
-                },
-                status=status.HTTP_200_OK,
-            )
+            return Response({'message': 'Random box opened successfully', 'random_boxes': pet.random_boxes,}, status=status.HTTP_200_OK,)
         except ValueError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return Response(
-                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
