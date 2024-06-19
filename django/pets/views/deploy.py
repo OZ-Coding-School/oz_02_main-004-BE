@@ -103,7 +103,11 @@ class FeedRiceView(APIView):
         snack_serializer = SnackSerializer(snack)
         pet_serializer = PetSerializer(pet)
 
-        return Response({'snack': snack_serializer.data, 'pet': pet_serializer.data}, status=status.HTTP_201_CREATED,)
+        pet_data = pet_serializer.data
+
+        pet_data["hunger_degree_status"] = "당신의 펫은 만족스러운 식사를 했습니다!"
+
+        return Response({'snack': snack_serializer.data, 'pet': pet_data}, status=status.HTTP_201_CREATED,)
 
 class FeedSnackView(APIView):
     permission_classes = [IsAuthenticated]
@@ -176,7 +180,12 @@ class FeedSnackView(APIView):
         snack_serializer = SnackSerializer(snack)
         pet_serializer = PetSerializer(pet)
 
-        return Response({'snack': snack_serializer.data, 'pet': pet_serializer.data}, status=status.HTTP_201_CREATED,)
+        pet_data = pet_serializer.data
+
+        pet_data["hunger_degree_status"] = "당신의 펫은 달콤함에 콧노래를 흥얼거립니다!"
+
+
+        return Response({'snack': snack_serializer.data, 'pet': pet_data}, status=status.HTTP_201_CREATED,)
 
 class OpenRandomBoxView(APIView):
     permission_classes = [IsAuthenticated]
