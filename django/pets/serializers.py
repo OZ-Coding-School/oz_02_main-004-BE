@@ -50,8 +50,8 @@ class PetSerializer(serializers.ModelSerializer):
         today_5am = timezone.make_aware(datetime.combine(current_time.date(), time(5, 0)))
 
         if obj.hunger_degree and obj.hunger_degree >= today_5am:
-            return "yes"
-        return "no"
+            return ""
+        return "당신의 펫은 배고픕니다!"
 
     
     class Meta:
