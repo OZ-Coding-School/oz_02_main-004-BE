@@ -12,12 +12,7 @@ class Command(BaseCommand):
     help = 'Create 10 superusers with unique emails and nicknames'
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            '--count',
-            type=int,
-            default=10,
-            help='Number of superusers to create'
-        )
+        parser.add_argument('--count', type=int, default=10, help='Number of superusers to create')
 
     def handle(self, *args, **kwargs):
         count = kwargs['count']

@@ -191,10 +191,10 @@ class OpenRandomBoxView(APIView):
             output_item = pet.open_random_boxes()
             return Response({'message': 'Random box opened successfully', 'random_boxes': pet.random_boxes, 'output_item': output_item,}, status=status.HTTP_200_OK,)
         except ValueError as e:
-            if str(e) == "No random boxes available":
+            if str(e) == 'No random boxes available':
                 return Response({'message': '랜덤박스가 없습니다.',}, status=status.HTTP_200_OK,)
             else:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -212,15 +212,9 @@ class ClosetAccessoriesView(APIView):
 
         for accessory in all_accessories:
             if accessory.item_name in closet_accessories_names:
-                response_data.append({
-                    "item": accessory.item_name,
-                    "image": accessory.image.url if accessory.image else ""
-                })
+                response_data.append({'item': accessory.item_name, 'image': accessory.image.url if accessory.image else ''})
             else:
-                response_data.append({
-                    "item": "???",
-                    "image": ""
-                })
+                response_data.append({'item': '???', 'image': ''})
 
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -239,15 +233,9 @@ class ClosetBackgroundsView(APIView):
 
         for background in all_backgrounds:
             if background.item_name in closet_backgrounds_names:
-                response_data.append({
-                    "item": background.item_name,
-                    "image": background.image.url if background.image else ""
-                })
+                response_data.append({'item': background.item_name, 'image': background.image.url if background.image else ''})
             else:
-                response_data.append({
-                    "item": "???",
-                    "image": ""
-                })
+                response_data.append({'item': '???', 'image': ''})
 
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -266,15 +254,9 @@ class ClosetPetsView(APIView):
 
         for pet in all_pets:
             if pet.pet_name in closet_pet_names:
-                response_data.append({
-                    "item": pet.pet_name,
-                    "image": pet.image.url if pet.image else ""
-                })
+                response_data.append({'item': pet.pet_name, 'image': pet.image.url if pet.image else ''})
             else:
-                response_data.append({
-                    "item": "???",
-                    "image": ""
-                })
+                response_data.append({'item': '???', 'image': ''})
 
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -365,7 +347,3 @@ class LookUpPetView(APIView):
             return Response(serializer.data)
         except Pet.DoesNotExist:
             return Response({'error': 'Pet not found'}, status=status.HTTP_404_NOT_FOUND)
-        
-
-
-
