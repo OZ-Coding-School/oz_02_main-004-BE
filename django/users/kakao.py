@@ -104,4 +104,6 @@ class KakaoLogoutView(APIView):
         for cookie in cookies_to_delete:
             response.delete_cookie(cookie, domain=domain, path='/')
 
+        response.data['redirect_url'] = 'https://oz-02-main-04.xyz'
+
         return response
