@@ -64,12 +64,12 @@ class Pet(CommonModel):
 
     def open_random_boxes(self):
         if self.random_boxes == 0:
-            raise ValueError("No random boxes available")
+            raise ValueError('No random boxes available')
 
         # Get all possible items
         accessories = list(Accessory.objects.all())
         backgrounds = list(Background.objects.all())
-        snacks = list(SnackType.objects.filter(name="snack"))
+        snacks = list(SnackType.objects.filter(name='snack'))
 
         # Get the user's current items
         closet, created = Closet.objects.get_or_create(pet=self)
@@ -98,28 +98,15 @@ class Pet(CommonModel):
             )
             snack.quantity += 1
             snack.save()
-            output_item = {
-                'type': 'snack',
-                'name': snack.snack_type.name,
-                'quantity': snack.quantity,
-                'image': snack.snack_type.image.url if snack.snack_type.image else ""
-            }
+            output_item = {'type': 'snack', 'name': snack.snack_type.name, 'quantity': snack.quantity, 'image': snack.snack_type.image.url if snack.snack_type.image else ''}
         else:
             # Add the chosen item to the user's closet
             if isinstance(randomly_chosen_item, Accessory):
                 closet.accessories.add(randomly_chosen_item)
-                output_item = {
-                    'type': 'accessory',
-                    'name': randomly_chosen_item.item_name,
-                    'image': randomly_chosen_item.image.url if randomly_chosen_item.image else ""
-                }
+                output_item = {'type': 'accessory', 'name': randomly_chosen_item.item_name, 'image': randomly_chosen_item.image.url if randomly_chosen_item.image else ''}
             elif isinstance(randomly_chosen_item, Background):
                 closet.backgrounds.add(randomly_chosen_item)
-                output_item = {
-                    'type': 'background',
-                    'name': randomly_chosen_item.item_name,
-                    'image': randomly_chosen_item.image.url if randomly_chosen_item.image else ""
-                }
+                output_item = {'type': 'background', 'name': randomly_chosen_item.item_name, 'image': randomly_chosen_item.image.url if randomly_chosen_item.image else ''}
 
         # Update random_boxes
         self.random_boxes -= 1
