@@ -205,8 +205,6 @@ class FeedSnackView(APIView):
         pet_data["hunger_degree_status"] = "당신의 펫은 달콤함에 콧노래를 흥얼거립니다!"
         if all_collections != '':
             pet_data["message"] = all_collections
-
-
         return Response({'snack': snack_serializer.data, 'pet': pet_data}, status=status.HTTP_201_CREATED,)
 
 class OpenRandomBoxView(APIView):
@@ -240,9 +238,6 @@ class ClosetAccessoriesView(APIView):
         closet_accessories = closet.accessories.all()
 
         name_primaryAccessory = pet.primary_accessory
-
-
-
         closet_accessories_names = { accessory.item_name for accessory in closet_accessories }
 
         response_data = []
@@ -253,8 +248,6 @@ class ClosetAccessoriesView(APIView):
                     selected = True
                 else:
                     selected = False
-
-
                 response_data.append({'selected': selected, 'item': accessory.item_name, 'image': accessory.image.url if accessory.image else ''})
             else:
                 response_data.append({'selected': False, 'item': '???', 'image': ''})
@@ -271,8 +264,6 @@ class ClosetBackgroundsView(APIView):
         closet_backgrounds = closet.backgrounds.all()
 
         name_primaryBackground = user_pet.primary_background
-
-
         closet_backgrounds_names = { background.item_name for background in closet_backgrounds }
 
         response_data = []
@@ -283,7 +274,6 @@ class ClosetBackgroundsView(APIView):
                     selected = True
                 else:
                     selected = False
-
                 response_data.append({'selected': selected, 'item': background.item_name, 'image': background.image.url if background.image else ''})
             else:
                 response_data.append({'selected': False, 'item': '???', 'image': ''})
@@ -300,7 +290,6 @@ class ClosetPetsView(APIView):
         closet_pets = closet.pet_collections.all()
 
         name_primaryPet = pet.primary_pet
-
         closet_pet_names = {pet.pet_name for pet in closet_pets}
         
         response_data = []
@@ -310,8 +299,7 @@ class ClosetPetsView(APIView):
                 if str(name_primaryPet) == str(pet.pet_name):
                     selected = True
                 else:
-                    selected = False
-                                    
+                    selected = False                                  
                 response_data.append({'selected': selected, 'item': pet.pet_name, 'image': pet.image.url if pet.image else ''})
             else:
                 response_data.append({'selected': False,'item': '???', 'image': ''})
@@ -366,7 +354,6 @@ class SelectPrimaryBackgroundView(APIView):
 
         pet.primary_background = background
         pet.save()
-
         return Response({'message': 'Primary background selected successfully'}, status=status.HTTP_200_OK,)
 
 class SelectPrimaryPetView(APIView):
@@ -391,7 +378,6 @@ class SelectPrimaryPetView(APIView):
 
         pet.primary_pet = selected_pet
         pet.save()
-
         return Response({'message': 'Primary pet selected successfully'}, status=status.HTTP_200_OK)
 
 class LookUpPetView(APIView):
