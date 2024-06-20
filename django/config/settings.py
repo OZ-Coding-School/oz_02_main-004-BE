@@ -170,6 +170,7 @@ AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend', 'allauth
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://localhost:8000', 'https://www.oz-02-main-04.xyz', 'https://api.oz-02-main-04.xyz', 'https://oz-02-main-04.xyz',]
