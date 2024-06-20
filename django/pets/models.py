@@ -52,7 +52,7 @@ class Pet(CommonModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='pet', verbose_name='사용자 ID')
     point = models.IntegerField(verbose_name='경험치', default=0)
     hunger_degree = models.DateTimeField(null=True, blank=True, verbose_name='최근 식사 시간')  # 최근 밥이나 간식 준 시간
-    random_boxes = models.PositiveIntegerField(verbose_name='랜덤 박스 갯수', default=10)
+    random_boxes = models.PositiveIntegerField(verbose_name='랜덤 박스 갯수', default=0)
     pet_rating = models.ForeignKey(PetRating, on_delete=models.CASCADE, related_name='pets', verbose_name='레이팅 ID',)
     primary_accessory = models.ForeignKey(Accessory, null=True, blank=True, on_delete=models.SET_NULL, related_name='primary_accessory_pets', verbose_name='대표 악세사리 아이템',)
     primary_background = models.ForeignKey(Background, null=True, blank=True, on_delete=models.SET_NULL, related_name='primary_background_pets', verbose_name='대표 배경 아이템',)
@@ -146,7 +146,7 @@ class SnackType(CommonModel):
 class Snack(CommonModel):
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='snacks', verbose_name='펫 ID')
     snack_type = models.ForeignKey(SnackType, on_delete=models.CASCADE, related_name='snacks', verbose_name='종류')  # 밥, 간식 구분
-    quantity = models.IntegerField(verbose_name='개수', default=10)
+    quantity = models.IntegerField(verbose_name='개수', default=0)
 
     def __str__(self):
         return f'{self.pet.user.email}의 {self.snack_type.name} ({self.quantity}개)'
