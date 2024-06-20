@@ -32,8 +32,8 @@ def create_pet_for_new_user(sender, instance, created, **kwargs):
         closet.pet_collections.add(default_pet_collection)
 
         # Get or create the snack and rice types
-        snack_type, created = SnackType.objects.get_or_create(name='snack')
-        rice_type, created = SnackType.objects.get_or_create(name='rice')
+        snack_type, created = SnackType.objects.get_or_create(name='snack', experience_points=20)
+        rice_type, created = SnackType.objects.get_or_create(name='rice', experience_points=10)
 
         # Give 10 snacks to the pet
         Snack.objects.create(pet=pet, snack_type=snack_type, quantity=10)
