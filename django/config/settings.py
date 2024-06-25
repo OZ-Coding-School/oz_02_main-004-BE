@@ -96,20 +96,6 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-    # import configparser
-    # CONF = configparser.ConfigParser()
-    # CONF.read("config.ini")
-    # DATABASES = {
-    #     "default": {
-    #         "ENGINE": "django.db.backends.mysql",
-    #         "NAME": CONF["mysql"]["DB_NAME"],
-    #         "USER": CONF["mysql"]["DB_USER"],
-    #         "PASSWORD": CONF["mysql"]["DB_PASS"],
-    #         "HOST": CONF["mysql"]["DB_HOST"],
-    #         "PORT": CONF["mysql"]["DB_PORT"],
-    #     }
-    # }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -184,6 +170,7 @@ AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend', 'allauth
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://localhost:8000', 'https://www.oz-02-main-04.xyz', 'https://api.oz-02-main-04.xyz', 'https://oz-02-main-04.xyz',]

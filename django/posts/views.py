@@ -21,6 +21,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 # get consecutive days when todo_progress > = 80
 from posts.utils import get_consecutive_success_days
 
+
 # /api/v1/posts/goal
 class UserGoalView(APIView):
     # only logined user are allowed to get an access
@@ -30,6 +31,9 @@ class UserGoalView(APIView):
         return request.user
 
     def get(self, request):
+        '''
+        Retrieve the goal for the authenticated user.
+        '''
         user = self.get_user(request)
         goal = getattr(user, 'goal', None)
         serializer = UserGoalSerializer(goal)
@@ -37,8 +41,11 @@ class UserGoalView(APIView):
 
     @swagger_auto_schema(request_body=UserGoalSerializer)
     def post(self, request):
+        '''
+        Create or update the goal for the authenticated user.
+        '''
         user = self.get_user(request)
-        goal, created = UserGoal.objects.get_or_create(user=user)
+        goal, _ = UserGoal.objects.get_or_create(user=user)
         serializer = UserGoalSerializer(goal, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -46,6 +53,7 @@ class UserGoalView(APIView):
             response_serializer = UserGoalSerializer(goal)
             return Response(response_serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # /api/v1/posts/calendar/
 class CalendarView(APIView):
@@ -55,6 +63,9 @@ class CalendarView(APIView):
         return request.user
 
     def get(self, request):
+        '''
+        Retrieve the streak of consecutive successful days.
+        '''
         user = self.get_user(request)
         streak = get_consecutive_success_days(user)
         serializer = ConsecutiveDaysSerializer(data={'streak': streak})
@@ -63,16 +74,20 @@ class CalendarView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 # /api/v1/posts/list
 class PostList(APIView):
-    # todo: 관리자만 접근 가능하도록 변경할것
+    # 관리자만 접근 가능
     permission_classes = [IsAuthenticated, IsStaffUser]
 
-    # 전체 post list
     def get(self, request):
+        '''
+        Retrieve a list of all posts (accessible by staff users only).
+        '''
         posts = Post.objects.all()
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 # /api/v1/posts
 class PostsByUser(APIView):
@@ -93,15 +108,20 @@ class PostsByUser(APIView):
         return Post.objects.filter(user=user, todo_date=target_date).first()
 
     def get(self, request):
+        '''
+        Retrieve a list of posts created by the authenticated user.
+        '''
         posts = self.get_posts_by_user(request)
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(request_body=PostCreateSerializer)
     def post(self, request):
+        '''
+        Create a new post for the authenticated user.
+        '''
         user = self.get_user(request)
-        data = request.data
-        serializer = PostCreateSerializer(data=data, context={'user': user})
+        serializer = PostCreateSerializer(data=request.data, context={'user': user})
         if serializer.is_valid():
             post = serializer.save()  # Save with the user
             serializer = PostSerializer(post)
@@ -111,6 +131,9 @@ class PostsByUser(APIView):
     # 포스트 내용 변경 : 'todo_date' is required
     @swagger_auto_schema(request_body=PostCreateSerializer)
     def put(self, request):
+        '''
+        Update a post created by the authenticated user on a specific date.
+        '''
         user = self.get_user(request)
         target_date = request.data.get('todo_date')
         post = self.get_post(request, target_date=target_date)
@@ -127,6 +150,9 @@ class PostsByUser(APIView):
     # 포스트 삭제 : 'todo_date' is required
     @swagger_auto_schema(request_body=PostDeleteSerializer)
     def delete(self, request):
+        '''
+        Delete a post created by the authenticated user on a specific date.
+        '''
         user = self.get_user(request)
         target_date = request.data.get('todo_date')
         post = self.get_post(request, target_date=target_date)
@@ -135,18 +161,23 @@ class PostsByUser(APIView):
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 # /api/v1/posts/todo/<int:post_id>
 class ToDoView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)
 
     @swagger_auto_schema(request_body=ToDoCreateSerializer)
     def post(self, request, post_id):
+        '''
+        Create a new to-do item for a specific post.
+        '''
         post = self.get_post(post_id)
-        # if request.user != post.user:
-        #     return Response({'error': 'You do not have permission to add a todo to this post.'}, status=status.HTTP_403_FORBIDDEN)
+
+        if request.user != post.user:
+            return Response({'error': 'You do not have permission to add a todo to this post.'}, status=status.HTTP_403_FORBIDDEN,)
 
         serializer = ToDoCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -159,20 +190,27 @@ class ToDoView(APIView):
         return Response(serializer.errors, status=status.HTTP_200_BAD_REQUEST)
 
     def get(self, request, post_id):
+        '''
+        Retrieve the to-do items for a specific post.
+        '''
         post = self.get_post(post_id)
-        todos = post.items.all()
+        todos = post.items.all().order_by('created_at')  # ascending order
         serializer = ToDoSerializer(todos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 # /api/v1/posts/todo/<int:post_id>/<int:todo_id>
 class ToDoEdit(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)
 
     @swagger_auto_schema(request_body=ToDoEditSerializer)
     def put(self, request, post_id, todo_id):
+        '''
+        Update a to-do item for a specific post.
+        '''
         post = self.get_post(post_id)
         try:
             todo = post.items.get(id=todo_id)
@@ -189,17 +227,22 @@ class ToDoEdit(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, post_id, todo_id):
+        '''
+        Delete a to-do item for a specific post.
+        '''
         post = self.get_post(post_id)
         try:
             todo = post.items.get(id=todo_id)
         except ToDo.DoesNotExist:
             return Response({'error': 'Todo item not found.'}, status=status.HTTP_404_NOT_FOUND)
         todo.delete()
+        post.update_progress()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 # /api/v1/posts/music/<int:post_id>
 class Spotify(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -293,9 +336,10 @@ class Spotify(APIView):
         current_song.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 # /api/v1/posts/music/playing/<int:post_id>
 class MusicView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)
@@ -316,9 +360,10 @@ class MusicView(APIView):
         serializer = SpotifySerializer(song)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 # /api/v1/posts/timer/<int:post_id>
 class TimerView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_post(self, post_id):
         return get_object_or_404(Post, id=post_id)

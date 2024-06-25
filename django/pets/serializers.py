@@ -50,8 +50,8 @@ class PetSerializer(serializers.ModelSerializer):
         today_5am = timezone.make_aware(datetime.combine(current_time.date(), time(5, 0)))
 
         if obj.hunger_degree and obj.hunger_degree >= today_5am:
-            return "yes"
-        return "no"
+            return "당신의 펫은 만족스러운 식사를 했습니다!"
+        return "당신의 펫은 배고픕니다!"
 
     
     class Meta:
@@ -66,7 +66,7 @@ class PetMainSerializer(PetSerializer):
     class Meta:
         model = Pet
         fields = [
-            'user', 'pet_rating', 'point', 'hunger_degree_status', 'active_pet', 'primary_background',
+            'user', 'pet_rating', 'point', 'hunger_degree_status', 'active_pet', 'primary_background', 'primary_accessory',
             'random_boxes', 'rice_quantity','snack_quantity'
             ]
 
@@ -77,7 +77,7 @@ class LoopUpPetSerializer(PetSerializer):
 
     class Meta:
         model = Pet
-        fields = ['user', 'nickname', 'pet_rating', 'point', 'hunger_degree_status', 'primary_pet', 'primary_background', 'guestbook_url']
+        fields = ['user', 'nickname', 'pet_rating', 'point', 'hunger_degree_status', 'primary_pet', 'primary_background', 'primary_accessory', 'guestbook_url']
 
     def get_nickname(self, obj):
         return obj.user.nickname

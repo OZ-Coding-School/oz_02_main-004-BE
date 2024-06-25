@@ -63,28 +63,33 @@ class FeedRiceView(APIView):
         total_experience = snack_type.experience_points * quantity
         pet.point += total_experience
 
+        all_collections = ''
+
         # Handle leveling up
         while pet.point >= pet.pet_rating.point:
             pet.point -= pet.pet_rating.point
             next_level = pet.pet_rating.level + 1
             max_level = PetRating.objects.aggregate(max_level=Max('level'))['max_level']
 
+            # Get or create the closet for the pet
+            closet, created = Closet.objects.get_or_create(pet=pet)
+            if created:
+                suspicious_egg = get_object_or_404(PetCollection, pet_name='수상한 알')
+                closet.pet_collections.add(suspicious_egg)
+
+            # Add a random pet to the closet when leveling up
+            all_pets = PetCollection.objects.all()
+            remaining_pets = all_pets.difference(closet.pet_collections.all())
+
             if next_level > max_level:
                 # Set pet back to level 1 and change active pet to '수상한 알'
                 pet.pet_rating = PetRating.objects.get(level=1)
                 suspicious_egg = get_object_or_404(PetCollection, pet_name='수상한 알')
                 pet.active_pet = suspicious_egg
+
+                if not remaining_pets.exists():
+                    all_collections = "모든종류의 펫을모았습니다."
             else:
-                # Get or create the closet for the pet
-                closet, created = Closet.objects.get_or_create(pet=pet)
-                if created:
-                    suspicious_egg = get_object_or_404(PetCollection, pet_name='수상한 알')
-                    closet.pet_collections.add(suspicious_egg)
-
-                # Add a random pet to the closet when leveling up
-                all_pets = PetCollection.objects.all()
-                remaining_pets = all_pets.difference(closet.pet_collections.all())
-
                 if remaining_pets.exists():
                     random_pet = random.choice(list(remaining_pets))
                     closet.pet_collections.add(random_pet)
@@ -92,8 +97,12 @@ class FeedRiceView(APIView):
                     if next_level == 2:
                         pet.active_pet = random_pet
                 else:
+                    if len(PetCollection.objects.all()) <= 1:
+                        random_pet = random.choice(PetCollection.objects.all())
+                    else:       
+                        random_pet = random.choice(PetCollection.objects.exclude(pet_name="수상한 알"))
                     if next_level == 2:
-                        return Response({'message': '모든종류의 펫을모았습니다.'}, status=status.HTTP_200_OK,)
+                        pet.active_pet = random_pet
 
                 pet.pet_rating = PetRating.objects.get(level=next_level)
 
@@ -103,7 +112,13 @@ class FeedRiceView(APIView):
         snack_serializer = SnackSerializer(snack)
         pet_serializer = PetSerializer(pet)
 
-        return Response({'snack': snack_serializer.data, 'pet': pet_serializer.data}, status=status.HTTP_201_CREATED,)
+        pet_data = pet_serializer.data
+
+        pet_data["hunger_degree_status"] = "당신의 펫은 만족스러운 식사를 했습니다!"
+        if all_collections != '':
+            pet_data["message"] = all_collections
+
+        return Response({'snack': snack_serializer.data, 'pet': pet_data}, status=status.HTTP_201_CREATED,)
 
 class FeedSnackView(APIView):
     permission_classes = [IsAuthenticated]
@@ -136,28 +151,33 @@ class FeedSnackView(APIView):
         total_experience = snack_type.experience_points * quantity
         pet.point += total_experience
 
+        all_collections = ''
+
         # Handle leveling up
         while pet.point >= pet.pet_rating.point:
             pet.point -= pet.pet_rating.point
             next_level = pet.pet_rating.level + 1
             max_level = PetRating.objects.aggregate(max_level=Max('level'))['max_level']
 
+            # Get or create the closet for the pet
+            closet, created = Closet.objects.get_or_create(pet=pet)
+            if created:
+                suspicious_egg = get_object_or_404(PetCollection, pet_name='수상한 알')
+                closet.pet_collections.add(suspicious_egg)
+
+            # Add a random pet to the closet when leveling up
+            all_pets = PetCollection.objects.all()
+            remaining_pets = all_pets.difference(closet.pet_collections.all())
+
             if next_level > max_level:
                 # Set pet back to level 1 and change active pet to '수상한 알'
                 pet.pet_rating = PetRating.objects.get(level=1)
                 suspicious_egg = get_object_or_404(PetCollection, pet_name='수상한 알')
                 pet.active_pet = suspicious_egg
+
+                if not remaining_pets.exists():
+                    all_collections = "모든종류의 펫을모았습니다."
             else:
-                # Get or create the closet for the pet
-                closet, created = Closet.objects.get_or_create(pet=pet)
-                if created:
-                    suspicious_egg = get_object_or_404(PetCollection, pet_name='수상한 알')
-                    closet.pet_collections.add(suspicious_egg)
-
-                # Add a random pet to the closet when leveling up
-                all_pets = PetCollection.objects.all()
-                remaining_pets = all_pets.difference(closet.pet_collections.all())
-
                 if remaining_pets.exists():
                     random_pet = random.choice(list(remaining_pets))
                     closet.pet_collections.add(random_pet)
@@ -165,8 +185,12 @@ class FeedSnackView(APIView):
                     if next_level == 2:
                         pet.active_pet = random_pet
                 else:
+                    if len(PetCollection.objects.all()) <= 1:
+                        random_pet = random.choice(PetCollection.objects.all())
+                    else:       
+                        random_pet = random.choice(PetCollection.objects.exclude(pet_name="수상한 알"))
                     if next_level == 2:
-                        return Response({'message': '모든종류의 펫을모았습니다.'}, status=status.HTTP_200_OK,)
+                        pet.active_pet = random_pet
 
                 pet.pet_rating = PetRating.objects.get(level=next_level)
 
@@ -176,7 +200,12 @@ class FeedSnackView(APIView):
         snack_serializer = SnackSerializer(snack)
         pet_serializer = PetSerializer(pet)
 
-        return Response({'snack': snack_serializer.data, 'pet': pet_serializer.data}, status=status.HTTP_201_CREATED,)
+        pet_data = pet_serializer.data
+
+        pet_data["hunger_degree_status"] = "당신의 펫은 달콤함에 콧노래를 흥얼거립니다!"
+        if all_collections != '':
+            pet_data["message"] = all_collections
+        return Response({'snack': snack_serializer.data, 'pet': pet_data}, status=status.HTTP_201_CREATED,)
 
 class OpenRandomBoxView(APIView):
     permission_classes = [IsAuthenticated]
@@ -189,9 +218,14 @@ class OpenRandomBoxView(APIView):
         pet = self.get_pet(request.user)
         try:
             output_item = pet.open_random_boxes()
+            if output_item["name"] == "snack":
+                output_item["name"] = "간식"
             return Response({'message': 'Random box opened successfully', 'random_boxes': pet.random_boxes, 'output_item': output_item,}, status=status.HTTP_200_OK,)
         except ValueError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            if str(e) == 'No random boxes available':
+                return Response({'message': '랜덤박스가 없습니다.',}, status=status.HTTP_200_OK,)
+            else:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -203,21 +237,20 @@ class ClosetAccessoriesView(APIView):
         all_accessories = Accessory.objects.all()
         closet_accessories = closet.accessories.all()
 
+        name_primaryAccessory = pet.primary_accessory
         closet_accessories_names = { accessory.item_name for accessory in closet_accessories }
 
         response_data = []
 
         for accessory in all_accessories:
             if accessory.item_name in closet_accessories_names:
-                response_data.append({
-                    "item": accessory.item_name,
-                    "image": accessory.image.url if accessory.image else ""
-                })
+                if str(name_primaryAccessory) == str(accessory.item_name):
+                    selected = True
+                else:
+                    selected = False
+                response_data.append({'selected': selected, 'item': accessory.item_name, 'image': accessory.image.url if accessory.image else ''})
             else:
-                response_data.append({
-                    "item": "???",
-                    "image": ""
-                })
+                response_data.append({'selected': False, 'item': '???', 'image': ''})
 
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -230,21 +263,20 @@ class ClosetBackgroundsView(APIView):
         all_backgrounds = Background.objects.all()
         closet_backgrounds = closet.backgrounds.all()
 
+        name_primaryBackground = user_pet.primary_background
         closet_backgrounds_names = { background.item_name for background in closet_backgrounds }
 
         response_data = []
 
         for background in all_backgrounds:
             if background.item_name in closet_backgrounds_names:
-                response_data.append({
-                    "item": background.item_name,
-                    "image": background.image.url if background.image else ""
-                })
+                if str(name_primaryBackground) == str(background.item_name):
+                    selected = True
+                else:
+                    selected = False
+                response_data.append({'selected': selected, 'item': background.item_name, 'image': background.image.url if background.image else ''})
             else:
-                response_data.append({
-                    "item": "???",
-                    "image": ""
-                })
+                response_data.append({'selected': False, 'item': '???', 'image': ''})
 
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -257,21 +289,20 @@ class ClosetPetsView(APIView):
         all_pets = PetCollection.objects.all()
         closet_pets = closet.pet_collections.all()
 
+        name_primaryPet = pet.primary_pet
         closet_pet_names = {pet.pet_name for pet in closet_pets}
         
         response_data = []
 
         for pet in all_pets:
             if pet.pet_name in closet_pet_names:
-                response_data.append({
-                    "item": pet.pet_name,
-                    "image": pet.image.url if pet.image else ""
-                })
+                if str(name_primaryPet) == str(pet.pet_name):
+                    selected = True
+                else:
+                    selected = False                                  
+                response_data.append({'selected': selected, 'item': pet.pet_name, 'image': pet.image.url if pet.image else ''})
             else:
-                response_data.append({
-                    "item": "???",
-                    "image": ""
-                })
+                response_data.append({'selected': False,'item': '???', 'image': ''})
 
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -312,7 +343,7 @@ class SelectPrimaryBackgroundView(APIView):
             properties={'item_name': openapi.Schema(type=openapi.TYPE_STRING, description='선택하는 아이템 이름',),},
         ),
     )
-    def post(self, request, pet_id):
+    def post(self, request):
         pet = get_object_or_404(Pet, user=request.user)
         item_name = request.data.get('item_name')
         background = get_object_or_404(Background, item_name=item_name)
@@ -323,7 +354,6 @@ class SelectPrimaryBackgroundView(APIView):
 
         pet.primary_background = background
         pet.save()
-
         return Response({'message': 'Primary background selected successfully'}, status=status.HTTP_200_OK,)
 
 class SelectPrimaryPetView(APIView):
@@ -348,7 +378,6 @@ class SelectPrimaryPetView(APIView):
 
         pet.primary_pet = selected_pet
         pet.save()
-
         return Response({'message': 'Primary pet selected successfully'}, status=status.HTTP_200_OK)
 
 class LookUpPetView(APIView):
